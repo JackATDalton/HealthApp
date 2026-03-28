@@ -50,9 +50,12 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 | VO₂ Max | Apple Watch (est.) | >55 mL/kg/min adjusted for AW underestimation¹ | Tier 1 |
 | Resting Heart Rate | Apple Watch | 40–55 bpm | Tier 1 |
 | Heart Rate Variability (HRV) | Apple Watch | Top quartile for age/sex (higher = better) | Tier 1 |
-| Blood Oxygen (SpO₂) | Apple Watch | 97–100% | Tier 2 |
+| Blood Oxygen (SpO₂) | Apple Watch | 97–100% | Tier 1 |
+| Blood Pressure (Systolic / Diastolic) | HealthKit (manual entry or connected device²) | <120/80 mmHg; optimal ~110/70 | Tier 1 |
 | Walking Heart Rate Avg | Apple Watch | <70 bpm (trending downward) | Tier 2 |
 | Cardio Recovery (1-min HR drop post-exercise) | Apple Watch | >20 bpm drop | Tier 2 |
+
+> **² Blood Pressure:** Apple Watch does not measure BP. The app reads from HealthKit, which accepts readings from connected devices (Withings, Omron, etc.) or manual entry. Even monthly manual readings are valuable given BP's strength as a longevity predictor. Users without a connected device are prompted to log manually and reminded that it's the most important metric to track.
 
 > **¹ VO₂ Max Apple Watch adjustment:** Apple Watch consistently underestimates VO₂ Max vs lab testing by ~3–5 mL/kg/min on average (varies by individual and workout type). The app will display the raw Apple Watch figure but note this discrepancy, apply a +3.5 mL/kg/min correction factor when evaluating against optimal ranges, and remind the user that a lab/metabolic test is the gold standard. Research (Kokkinos, Attia, JAMA 2022): elite VO₂ Max (top 2.5%) associates with ~5× lower all-cause mortality vs bottom quartile.
 
@@ -65,10 +68,14 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 | Sleep Efficiency | HealthKit | >90% | Tier 1 |
 | Deep Sleep % | Apple Watch | >20% of total sleep | Tier 1 |
 | REM Sleep % | Apple Watch | 20–25% of total sleep | Tier 1 |
+| Time Awake During Night | Apple Watch | <5% of time in bed | Tier 1 |
+| 5-Day Sleep Debt | Derived | <30 min cumulative deficit | Tier 1 |
 | Sleep Consistency (bedtime variance) | HealthKit | <20 min variance (circadian anchor) | Tier 2 |
 | Respiratory Rate during sleep | Apple Watch | 12–15 breaths/min | Tier 2 |
 
 > **Note on sleep duration:** The U-curve is real — both <6 hrs and >9 hrs associate with mortality. Optimal is 7–8.5 hrs, not "as much as possible."
+
+> **Sleep debt:** Calculated as rolling 5-day cumulative deficit against the user's 7.5-hr target. One short night barely registers; three consecutive short nights triggers a meaningful debt signal that depresses the recovery score and is flagged in the longevity plan.
 
 ---
 
@@ -77,12 +84,18 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 |---|---|---|---|
 | VO₂ Max (see Cardiovascular) | — | — | — |
 | Daily Steps | Apple Watch | 10,000–12,000 (diminishing returns above ~12k) | Tier 1 |
-| Exercise Minutes (Zone 2 cardio) | Apple Watch | 180+ min/week | Tier 1 |
-| Vigorous Activity Minutes | Apple Watch | 20–30 min/week HIIT equivalent | Tier 1 |
+| Zone 2 Minutes / week | Derived from workout HR data | 180+ min/week | Tier 1 |
+| Vigorous / High-Intensity Minutes / week | Derived from workout HR data | 20–30 min/week | Tier 1 |
+| Strength Training Sessions / week | Apple Watch workout type | 3+ sessions/week | Tier 1 |
+| 7-Day Training Load | Derived (HR × duration across workouts) | Trending stable or improving | Tier 2 |
 | Stand / Non-sedentary hours | Apple Watch | <8 hrs sitting; 12+ active hours | Tier 2 |
 | Resting Energy (TDEE trend) | HealthKit | Stable or improving metabolic rate | Tier 3 |
 
-> **Zone 2 framing:** Research (Attia, Iñigo San Millán) supports ~80% of training volume at low intensity (conversational pace, nose-breathing). Vigorous minutes cover the remaining high-intensity work shown to extend VO₂ Max ceiling.
+> **Zone 2 framing:** Research (Attia, Iñigo San Millán) supports ~80% of training volume at low intensity (conversational pace, nose-breathing). Vigorous minutes cover the remaining ~20% of high-intensity work. Zone 2 is derived from workout heart rate data: time spent at 60–70% of max HR (220 − age). Vigorous = time above 80% max HR. Apple Watch logs HR continuously during recorded workouts, making this calculation possible without any extra effort from the user.
+
+> **Strength training:** Muscle mass and strength are strongly associated with all-cause mortality reduction (Srikanthan & Kalantar-Zadeh, 2014; Attia). Apple Watch workout type classifications (Strength Training, Functional Strength, etc.) are used to count sessions. Target is 3+ sessions/week.
+
+> **Training Load:** Weekly load = sum of (avg HR as % max HR × duration) across all workouts. Used to contextualise recovery score — a high load score alongside low recovery signals accumulated fatigue.
 
 ---
 
@@ -111,18 +124,25 @@ Apple's native app does not surface a useful daily readiness/recovery signal. Th
 
 ### How it's calculated
 
-The Recovery Score is a **0–100 daily score** derived from four overnight inputs, each weighted by their evidence for reflecting autonomic recovery:
+The Recovery Score is a **0–100 daily score** derived from seven overnight inputs, each weighted by their evidence for reflecting autonomic nervous system recovery:
 
 | Input | Weight | What "good" looks like |
 |---|---|---|
-| HRV (overnight average vs your 30-day baseline) | 40% | At or above personal baseline |
-| Resting Heart Rate (overnight low vs your 30-day baseline) | 30% | At or below personal baseline |
-| Sleep Quality (efficiency × deep% × duration vs optimal) | 20% | >90% efficiency, >20% deep, 7–8.5 hrs |
-| Respiratory Rate (vs personal baseline) | 10% | Stable; elevated RR signals illness/stress |
+| HRV (overnight average vs 30-day personal baseline) | 35% | At or above personal baseline |
+| Resting Heart Rate (overnight low vs 30-day personal baseline) | 25% | At or below personal baseline |
+| Sleep Quality (efficiency × deep% × time-awake-during-night) | 20% | >90% efficiency, >20% deep, <5% awake |
+| Sleep Debt (5-day rolling deficit vs 7.5-hr target) | 10% | <30 min cumulative deficit |
+| Respiratory Rate (vs personal baseline) | 5% | Stable; elevated RR signals illness/stress |
+| SpO₂ (overnight minimum) | 3% | ≥97%; dips below 95% are a significant drag |
+| Wrist Temperature deviation (vs personal baseline) | 2% | Within ±0.5°C; spikes = illness/stress signal |
+
+> Wrist temperature requires Apple Watch Series 8 or later. SpO₂ measurement frequency varies by Watch model. If either is unavailable, weights are redistributed proportionally across the remaining inputs.
 
 **Key principle:** scores are relative to *your own baselines*, not population averages. A trained athlete with RHR of 42 and a beginner with RHR of 62 both score well when they're near their own normal.
 
-**Baseline initialisation:** a minimum of 14 days of Apple Watch data is needed before the Recovery Score is meaningful. Until then, the dashboard shows a "Building your baseline" state with a progress indicator. The app can use existing historical HealthKit data (not just data collected after install) to satisfy this requirement immediately for most users.
+**Baseline initialisation:** a minimum of 14 days of Apple Watch data is needed before the Recovery Score is meaningful. Until then, the dashboard shows a "Building your baseline" state with a progress indicator. The app reads existing historical HealthKit data on first launch, so most users will have a baseline ready immediately.
+
+**Missing data handling:** if any required input is unavailable for a given night (watch not worn, incomplete recording), the score is marked **Incomplete** rather than estimated. The dashboard shows which input is missing. Scores are never fabricated from partial data.
 
 ### Score bands
 
@@ -234,8 +254,11 @@ iOS App (SwiftUI)
 │   ├── TrendAnalyser            — 7-day / 30-day trend + direction
 │   ├── EvidenceWeighter         — apply tier weights to deviation scores
 │   ├── PriorityRanker           — final priority sort for Claude prompt
-│   ├── RecoveryScoreCalculator  — compute daily 0–100 score from HRV/RHR/sleep/RespRate vs personal baselines
-│   └── LongevityScoreCalculator — non-linear aggregate: weighted average with Tier 1 outlier penalty (single bad Tier 1 metric caps overall score)
+│   ├── HRZoneAnalyser           — derive Zone 2 / vigorous minutes from workout HR data
+│   ├── TrainingLoadCalculator   — weekly load score from HR × duration across workouts
+│   ├── SleepDebtTracker         — 5-day rolling sleep deficit vs 7.5-hr target
+│   ├── RecoveryScoreCalculator  — compute daily 0–100 from 7 overnight inputs vs personal baselines; marks Incomplete if data missing
+│   └── LongevityScoreCalculator — non-linear aggregate: weighted avg + Tier 1 outlier penalty formula: min(Tier1 scores)×0.5 + weighted_avg×0.5
 ├── Claude Layer
 │   ├── PromptBuilder            — assemble structured health snapshot + user profile
 │   ├── ClaudeAPIClient          — Anthropic REST API with SSE streaming
@@ -268,7 +291,7 @@ iOS App (SwiftUI)
 
 ## 10. Screens
 
-1. **Dashboard** — Recovery Score (large, top), Longevity Score, metric cards grid, re-plan nudge banner (when applicable), "Generate Plan" CTA, last-synced timestamp
+1. **Dashboard** — Recovery Score (large, top, with Incomplete state if data missing), Longevity Score, pinned Focus Metric card (Claude's current recommended priority — persists between plan generations), metric cards grid, re-plan nudge banner (when applicable), "Generate Plan" CTA, last-synced timestamp
 2. **Recovery Detail** — today's score breakdown (HRV / RHR / sleep / resp. rate contributions), 30-day recovery trend chart
 3. **Metric Detail** — 30-day trend chart, current vs optimal range visualisation, evidence tier explanation, enable/disable toggle, custom range editor
 4. **Plan View** — current AI plan streamed live on generation; sections: Status Summary / Recovery Context / Priority Issues / Action Plan / Passive Progress / Wins / Focus
@@ -335,20 +358,28 @@ Minimal, non-intrusive:
 | User profile | Auto-imported from HealthKit where available; no medical conditions — fitness background + goal only |
 | Habit tracking | No manual logging — progress inferred passively from HealthKit data |
 | Metric suppression | Any metric can be disabled and excluded from analysis |
-| Longevity score | Yes — non-linear aggregate: Tier 1 metric failures penalised disproportionately; a single critical Tier 1 outlier can cap the overall score |
+| Blood pressure | Tier 1 metric; reads from HealthKit (connected devices or manual entry); prompted on onboarding as highest-priority manual input |
+| Strength training | Tracked via Apple Watch workout type; target 3+ sessions/week; Tier 1 |
+| HR zone tracking | Zone 2 and vigorous minutes derived from workout HR data (not self-reported); Zone 2 = 60–70% max HR |
+| Training load | Weekly load score derived from HR × duration; fed to Claude alongside recovery score to detect load/recovery imbalance |
+| Sleep debt | 5-day rolling deficit vs 7.5-hr target; contributes 10% to recovery score |
+| Focus metric | Claude's single highest-leverage recommendation for the current period; persists as pinned card on dashboard between plan generations; distinct from Longevity Score |
+| Longevity score formula | `score = min(Tier1_scores) × 0.5 + weighted_average_all × 0.5` — a single Tier 1 metric at 20/100 cannot produce a total above ~60; weighted average uses evidence tier as weight multiplier |
 | Re-plan nudge | Yes — app detects meaningful metric shifts and surfaces a banner prompt |
 | Medical caveats | No conservative caveating — personal tool, direct recommendations |
 | VO₂ Max calibration | Apple Watch underestimates by ~3.5 mL/kg/min; app applies correction factor and notes discrepancy |
 | Claude streaming | Yes — response streams live using SSE |
-| Recovery score | Yes — computed daily from HRV, RHR, sleep quality, respiratory rate vs personal baselines; 14-day minimum before score is shown (show "building baseline" state until then) |
+| Recovery score inputs | 7 inputs: HRV (35%), RHR (25%), sleep quality (20%), sleep debt (10%), respiratory rate (5%), SpO₂ (3%), wrist temp (2%); weights redistribute if inputs unavailable; Incomplete state if HRV/RHR/sleep missing |
+| Recovery score baseline | 14-day minimum; reads existing HealthKit history on first launch so most users qualify immediately |
+| Missing data | Recovery Score shows "Incomplete" rather than estimating — never fabricated from partial data |
 
 ---
 
 ## 16. Open Questions
 
-1. **Recovery score weighting** — the 40/30/20/10 split (HRV/RHR/sleep/RespRate) is a starting point; fixed for now, revisit after real-world use
+1. **Recovery score weighting** — the 35/25/20/10/5/3/2 split is a starting point; fixed for now, revisit after real-world use
 2. **Re-plan nudge threshold** — "3+ metrics changed by >10% of range" is an initial heuristic; tune after real data is available
 
 ---
 
-*Draft v0.4 — 2026-03-28*
+*Draft v0.5 — 2026-03-28*
