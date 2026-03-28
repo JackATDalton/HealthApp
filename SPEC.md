@@ -1,12 +1,12 @@
 # Longevity AI — App Specification
 
-> Personal iOS app that reads Apple Watch / HealthKit data, analyses it against maximally ambitious longevity-optimised ranges, and uses the Claude API to generate on-demand personalised plans.
+> Personal iOS app that reads Apple Watch / HealthKit data, analyses it against maximally ambitious longevity-optimised ranges, computes a daily recovery score, and uses the Claude API to generate on-demand personalised longevity plans.
 
 ---
 
 ## 1. Vision
 
-A private, single-user iOS app that acts as a personal longevity coach. It pulls real health data from Apple Watch and HealthKit, benchmarks each metric against evidence-based *optimal* ranges (not government minimums — what the research actually suggests maximises lifespan and healthspan), identifies gaps weighted by strength of evidence, and calls Claude on demand to produce a prioritised, plain-English action plan. Progress is tracked passively through HealthKit — no manual habit logging.
+A private, single-user iOS app that acts as a personal longevity coach. It pulls real health data from Apple Watch and HealthKit, benchmarks each metric against evidence-based *optimal* ranges (not government minimums — what the research actually suggests maximises lifespan and healthspan), computes a daily recovery score from overnight biometrics, and calls Claude on demand to produce a prioritised, plain-English action plan. Progress is tracked passively through HealthKit — no manual habit logging.
 
 ---
 
@@ -15,18 +15,20 @@ A private, single-user iOS app that acts as a personal longevity coach. It pulls
 ```
 First Launch
   → Pull user profile from HealthKit (age, sex, height, weight)
-  → User fills any gaps + adds medical context (conditions, medications)
+  → User fills any gaps (fitness background, primary goal)
   → User reviews metric list, disables any they don't care about
   → Set custom range overrides if desired (optional)
 
 Daily Use
   → Open App
   → Dashboard auto-syncs latest HealthKit data
+  → View today's Recovery Score (computed from last night's biometrics)
   → View metrics colour-coded (optimal / borderline / out of range)
+  → View overall Longevity Score (aggregate of all enabled metrics)
+  → If data has shifted meaningfully since last plan → nudge to re-generate
   → Tap "Generate Plan" when desired
-  → Claude analyses gaps (weighted by evidence strength) → ranked longevity plan
+  → Claude response streams in live → ranked longevity plan
   → Plan references passive HealthKit signals for progress (sleep, activity rings, etc.)
-  → Re-generate when meaningful time has passed or data has changed
 ```
 
 ---
@@ -45,14 +47,14 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 ### Cardiovascular
 | Metric | Source | Longevity-Optimal Range | Evidence Tier |
 |---|---|---|---|
-| VO₂ Max | Apple Watch | >55 mL/kg/min (elite; top 2% for age) | Tier 1 |
+| VO₂ Max | Apple Watch (est.) | >55 mL/kg/min adjusted for AW underestimation¹ | Tier 1 |
 | Resting Heart Rate | Apple Watch | 40–55 bpm | Tier 1 |
 | Heart Rate Variability (HRV) | Apple Watch | Top quartile for age/sex (higher = better) | Tier 1 |
 | Blood Oxygen (SpO₂) | Apple Watch | 97–100% | Tier 2 |
 | Walking Heart Rate Avg | Apple Watch | <70 bpm (trending downward) | Tier 2 |
 | Cardio Recovery (1-min HR drop post-exercise) | Apple Watch | >20 bpm drop | Tier 2 |
 
-> **Note on VO₂ Max:** Research (Kokkinos, Attia, JAMA 2022) shows the highest longevity benefit is in moving from low to moderate fitness, but elite-level VO₂ Max (top 2.5%) is associated with a ~5× reduction in all-cause mortality vs bottom quartile. Optimal target is therefore ambitious, not just "normal".
+> **¹ VO₂ Max Apple Watch adjustment:** Apple Watch consistently underestimates VO₂ Max vs lab testing by ~3–5 mL/kg/min on average (varies by individual and workout type). The app will display the raw Apple Watch figure but note this discrepancy, apply a +3.5 mL/kg/min correction factor when evaluating against optimal ranges, and remind the user that a lab/metabolic test is the gold standard. Research (Kokkinos, Attia, JAMA 2022): elite VO₂ Max (top 2.5%) associates with ~5× lower all-cause mortality vs bottom quartile.
 
 ---
 
@@ -103,7 +105,49 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 
 ---
 
-## 4. User Profile & Onboarding
+## 4. Recovery Score
+
+Apple's native app does not surface a useful daily readiness/recovery signal. This app computes one from overnight Apple Watch data, inspired by Whoop's approach.
+
+### How it's calculated
+
+The Recovery Score is a **0–100 daily score** derived from four overnight inputs, each weighted by their evidence for reflecting autonomic recovery:
+
+| Input | Weight | What "good" looks like |
+|---|---|---|
+| HRV (overnight average vs your 30-day baseline) | 40% | At or above personal baseline |
+| Resting Heart Rate (overnight low vs your 30-day baseline) | 30% | At or below personal baseline |
+| Sleep Quality (efficiency × deep% × duration vs optimal) | 20% | >90% efficiency, >20% deep, 7–8.5 hrs |
+| Respiratory Rate (vs personal baseline) | 10% | Stable; elevated RR signals illness/stress |
+
+**Key principle:** scores are relative to *your own baselines*, not population averages. A trained athlete with RHR of 42 and a beginner with RHR of 62 both score well when they're near their own normal.
+
+### Score bands
+
+| Score | Label | Meaning |
+|---|---|---|
+| 85–100 | Recovered | Push hard today — good day for high-intensity training |
+| 65–84 | Moderate | Normal training fine; avoid max-effort sessions |
+| 40–64 | Fatigued | Prioritise Zone 2 or active recovery; investigate sleep |
+| 0–39 | Under-recovered | Rest day recommended; something is off (illness, stress, poor sleep) |
+
+### Dashboard display
+
+- Large, prominent score on the dashboard — the first thing you see each morning
+- Colour-coded ring or arc (green / amber / orange / red)
+- Tap to see the breakdown: which of the 4 inputs is dragging the score and why
+- 30-day trend chart to see recovery patterns (e.g. cumulative fatigue building across a training block)
+
+### Recovery score in the longevity plan
+
+When generating a plan, Claude receives:
+- Today's recovery score + which inputs drove it
+- 7-day recovery score history
+- This allows Claude to adjust recommendations: e.g. "your recovery has been below 65 for 5 of the last 7 days — your current training load may be exceeding your recovery capacity"
+
+---
+
+## 5. User Profile & Onboarding
 
 ### Auto-pulled from HealthKit (with user permission)
 - Date of birth → age
@@ -113,9 +157,7 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 - Blood type (if stored)
 
 ### User-provided (short onboarding form, skippable fields)
-- Medical conditions relevant to longevity (e.g. hypertension, T2D, family history of CVD/cancer)
-- Current medications (affects interpretation — e.g. beta-blockers suppress HRV/RHR)
-- Fitness background (sedentary / moderately active / trained athlete) — helps calibrate VO₂ Max targets
+- Fitness background (sedentary / moderately active / trained athlete) — calibrates VO₂ Max targets and recovery baselines
 - Primary goal (live as long as possible / maximise energy & performance / disease prevention)
 - Any metrics to disable upfront
 
@@ -127,15 +169,17 @@ Metrics are weighted by **evidence tier** — how strongly peer-reviewed longevi
 
 ---
 
-## 5. Claude API Integration
+## 6. Claude API Integration
 
 ### What Claude receives
 A structured JSON-like prompt containing:
-- User profile: age, sex, fitness background, relevant medical context, active medications
+- User profile: age, sex, fitness background, primary goal
+- Today's Recovery Score + breakdown (HRV, RHR, sleep quality, respiratory rate contributions)
+- 7-day recovery score history
 - Per metric (enabled only): name, current value, 7-day average, 30-day trend direction, longevity-optimal range, user's custom range (if set), deviation score, evidence tier
 - Metrics sorted by: `(deviation from optimal) × (evidence tier weight)`
 - Previous plan summary (for continuity — "last time we focused on X")
-- Recent HealthKit signals used as passive progress indicators (e.g. sleep duration last 7 days, exercise minutes last 7 days, active energy trend)
+- Recent HealthKit signals used as passive progress indicators (sleep duration last 7 days, exercise minutes last 7 days, active energy trend, steps)
 
 ### What Claude returns
 1. **Status Summary** — 2–3 sentences on overall longevity picture, honest and direct
@@ -149,15 +193,15 @@ A structured JSON-like prompt containing:
 
 ### Prompt design principles
 - Longevity frameworks explicitly included in system prompt: Peter Attia (outlive framework), Bryan Johnson (Blueprint), Valter Longo (longevity diet/fasting research), hallmarks of aging literature
-- Ranges are described as "optimal for longevity" not "healthy" — Claude should distinguish these
-- User's medical context used to caveat or adjust recommendations appropriately
-- Tone: direct, evidence-citing, no hedging for the sake of hedging
-- Model: Claude claude-sonnet-4-6 (default) — configurable to claude-opus-4-6 for deeper analysis
-- Plans stored locally and versioned
+- Ranges are described as "optimal for longevity" not "healthy" — Claude should distinguish these clearly
+- Tone: direct, evidence-citing, no hedging for the sake of hedging — this is a personal tool, not a medical product
+- Claude response is streamed — UI renders text progressively as it arrives
+- Model: claude-sonnet-4-6 (default) — configurable to claude-opus-4-6 for deeper analysis
+- Plans stored locally and versioned (SwiftData)
 
 ---
 
-## 6. Passive Progress Tracking
+## 7. Passive Progress Tracking
 
 No manual habit logging. Progress is inferred from HealthKit data that updates automatically:
 
@@ -174,7 +218,7 @@ When generating a new plan, Claude opens with a brief "since your last plan" rec
 
 ---
 
-## 7. App Architecture
+## 8. App Architecture
 
 ```
 iOS App (SwiftUI)
@@ -187,10 +231,12 @@ iOS App (SwiftUI)
 │   ├── MetricEvaluator          — compare values against optimal/custom ranges
 │   ├── TrendAnalyser            — 7-day / 30-day trend + direction
 │   ├── EvidenceWeighter         — apply tier weights to deviation scores
-│   └── PriorityRanker           — final priority sort for Claude prompt
+│   ├── PriorityRanker           — final priority sort for Claude prompt
+│   ├── RecoveryScoreCalculator  — compute daily 0–100 score from HRV/RHR/sleep/RespRate
+│   └── LongevityScoreCalculator — aggregate score across all enabled metrics
 ├── Claude Layer
 │   ├── PromptBuilder            — assemble structured health snapshot + user profile
-│   ├── ClaudeAPIClient          — Anthropic REST API (streaming preferred)
+│   ├── ClaudeAPIClient          — Anthropic REST API with SSE streaming
 │   └── ResponseParser           — parse + store structured plan
 ├── UI Layer
 │   ├── DashboardView            — metric cards, colour-coded, disable toggle
@@ -205,7 +251,7 @@ iOS App (SwiftUI)
 
 ---
 
-## 8. UI / UX Design Principles
+## 9. UI / UX Design Principles
 
 - **Dark mode first** — longevity/performance aesthetic
 - **Dashboard** — metric cards colour-coded: green (optimal), amber (borderline), red (out of range), grey (disabled)
@@ -218,26 +264,28 @@ iOS App (SwiftUI)
 
 ---
 
-## 9. Screens
+## 10. Screens
 
-1. **Dashboard** — metric cards grid, overall longevity score, last-synced timestamp, "Generate Plan" CTA
-2. **Metric Detail** — 30-day trend chart, current vs optimal range visualisation, evidence tier explanation, enable/disable toggle, custom range editor
-3. **Plan View** — current AI plan: Status Summary / Priority Issues / Action Plan / Passive Progress / Wins / Focus
-4. **Plan History** — chronological list of past plans, tap to read any previous plan
-5. **Onboarding / Profile** — HealthKit import + manual context fields, accessible again from Settings
-6. **Settings** — Claude API key (Keychain-backed), model selector, units (metric/imperial), reset options
+1. **Dashboard** — Recovery Score (large, top), Longevity Score, metric cards grid, re-plan nudge banner (when applicable), "Generate Plan" CTA, last-synced timestamp
+2. **Recovery Detail** — today's score breakdown (HRV / RHR / sleep / resp. rate contributions), 30-day recovery trend chart
+3. **Metric Detail** — 30-day trend chart, current vs optimal range visualisation, evidence tier explanation, enable/disable toggle, custom range editor
+4. **Plan View** — current AI plan streamed live on generation; sections: Status Summary / Recovery Context / Priority Issues / Action Plan / Passive Progress / Wins / Focus
+5. **Plan History** — chronological list of past plans, tap to read any previous plan
+6. **Onboarding / Profile** — HealthKit import + fitness background + primary goal; accessible again from Settings
+7. **Settings** — Claude API key (Keychain-backed), model selector, units (metric/imperial), re-plan nudge toggle, reset options
 
 ---
 
-## 10. Notifications
+## 11. Notifications
 
 Minimal, non-intrusive:
-- Optional: weekly nudge to generate a new plan if none has been generated in 7+ days
+- Optional: nudge to generate a new plan when key metrics have shifted meaningfully since last plan (configurable threshold, default: 3+ metrics have changed by >10% of their range)
+- Optional: weekly reminder if no plan has been generated in 7+ days
 - No daily pings, no streak alerts, no engagement-bait notifications
 
 ---
 
-## 11. Data Privacy
+## 12. Data Privacy
 
 - All health data stays on-device — never sent to any server other than Anthropic's Claude API
 - Only structured metric *summaries* sent (no raw time-series data)
@@ -247,7 +295,7 @@ Minimal, non-intrusive:
 
 ---
 
-## 12. Out of Scope (v1)
+## 13. Out of Scope (v1)
 
 - Third-party wearable integrations (Oura, Whoop, Garmin) — HealthKit only
 - Lab results / blood panel integration — manual entry in v2
@@ -259,7 +307,7 @@ Minimal, non-intrusive:
 
 ---
 
-## 13. Tech Stack
+## 14. Tech Stack
 
 | Layer | Choice | Reason |
 |---|---|---|
@@ -274,7 +322,7 @@ Minimal, non-intrusive:
 
 ---
 
-## 14. Resolved Design Decisions
+## 15. Resolved Design Decisions
 
 | Decision | Resolution |
 |---|---|
@@ -282,20 +330,25 @@ Minimal, non-intrusive:
 | Metric weighting | Weighted by evidence tier (Tier 1 > 2 > 3) × deviation from optimal |
 | Optimal ranges | Maximally ambitious for longevity (research-backed, not government guidelines) |
 | Custom ranges | Supported per metric; user's override shown alongside research default |
-| User profile | Auto-imported from HealthKit where available; manual supplement for medical context |
+| User profile | Auto-imported from HealthKit where available; no medical conditions — fitness background + goal only |
 | Habit tracking | No manual logging — progress inferred passively from HealthKit data |
 | Metric suppression | Any metric can be disabled and excluded from analysis |
+| Longevity score | Yes — aggregate score shown on dashboard as motivator |
+| Re-plan nudge | Yes — app detects meaningful metric shifts and surfaces a banner prompt |
+| Medical caveats | No conservative caveating — personal tool, direct recommendations |
+| VO₂ Max calibration | Apple Watch underestimates by ~3.5 mL/kg/min; app applies correction factor and notes discrepancy |
+| Claude streaming | Yes — response streams live using SSE |
+| Recovery score | Yes — computed daily from HRV, RHR, sleep quality, respiratory rate vs personal baselines |
 
 ---
 
-## 15. Open Questions
+## 16. Open Questions
 
-1. **Longevity score** — single aggregate score on the dashboard: useful motivator or reductive/misleading?
-2. **Plan regeneration signal** — should the app suggest "your data has changed enough to re-plan" or leave it entirely up to the user?
-3. **Medical caveats** — how conservatively should Claude caveat recommendations given user-reported medical conditions? (e.g. HRV targets may differ significantly with known arrhythmia)
-4. **VO₂ Max target calibration** — Apple Watch VO₂ Max tends to underestimate vs lab testing; should the app note this discrepancy and adjust targets?
-5. **Streaming vs batch** — stream Claude's response word-by-word (feels live) or show full response at once?
+1. **Recovery score weighting** — the 40/30/20/10 split (HRV/RHR/sleep/RespRate) is a starting point; should it be user-adjustable or fixed?
+2. **Re-plan nudge threshold** — "3+ metrics changed by >10% of range" is an initial heuristic; needs tuning once real data is available
+3. **Longevity score formula** — simple weighted average of metric scores, or something non-linear that penalises critical Tier 1 failures more heavily?
+4. **Baseline initialisation** — Recovery Score needs a personal baseline for HRV/RHR; how many days of data are needed before the score is meaningful? (Suggest: 14-day minimum, show "building baseline" state before that)
 
 ---
 
-*Draft v0.2 — 2026-03-28*
+*Draft v0.3 — 2026-03-28*
