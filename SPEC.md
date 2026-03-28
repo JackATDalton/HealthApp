@@ -122,6 +122,8 @@ The Recovery Score is a **0–100 daily score** derived from four overnight inpu
 
 **Key principle:** scores are relative to *your own baselines*, not population averages. A trained athlete with RHR of 42 and a beginner with RHR of 62 both score well when they're near their own normal.
 
+**Baseline initialisation:** a minimum of 14 days of Apple Watch data is needed before the Recovery Score is meaningful. Until then, the dashboard shows a "Building your baseline" state with a progress indicator. The app can use existing historical HealthKit data (not just data collected after install) to satisfy this requirement immediately for most users.
+
 ### Score bands
 
 | Score | Label | Meaning |
@@ -232,8 +234,8 @@ iOS App (SwiftUI)
 │   ├── TrendAnalyser            — 7-day / 30-day trend + direction
 │   ├── EvidenceWeighter         — apply tier weights to deviation scores
 │   ├── PriorityRanker           — final priority sort for Claude prompt
-│   ├── RecoveryScoreCalculator  — compute daily 0–100 score from HRV/RHR/sleep/RespRate
-│   └── LongevityScoreCalculator — aggregate score across all enabled metrics
+│   ├── RecoveryScoreCalculator  — compute daily 0–100 score from HRV/RHR/sleep/RespRate vs personal baselines
+│   └── LongevityScoreCalculator — non-linear aggregate: weighted average with Tier 1 outlier penalty (single bad Tier 1 metric caps overall score)
 ├── Claude Layer
 │   ├── PromptBuilder            — assemble structured health snapshot + user profile
 │   ├── ClaudeAPIClient          — Anthropic REST API with SSE streaming
@@ -333,22 +335,20 @@ Minimal, non-intrusive:
 | User profile | Auto-imported from HealthKit where available; no medical conditions — fitness background + goal only |
 | Habit tracking | No manual logging — progress inferred passively from HealthKit data |
 | Metric suppression | Any metric can be disabled and excluded from analysis |
-| Longevity score | Yes — aggregate score shown on dashboard as motivator |
+| Longevity score | Yes — non-linear aggregate: Tier 1 metric failures penalised disproportionately; a single critical Tier 1 outlier can cap the overall score |
 | Re-plan nudge | Yes — app detects meaningful metric shifts and surfaces a banner prompt |
 | Medical caveats | No conservative caveating — personal tool, direct recommendations |
 | VO₂ Max calibration | Apple Watch underestimates by ~3.5 mL/kg/min; app applies correction factor and notes discrepancy |
 | Claude streaming | Yes — response streams live using SSE |
-| Recovery score | Yes — computed daily from HRV, RHR, sleep quality, respiratory rate vs personal baselines |
+| Recovery score | Yes — computed daily from HRV, RHR, sleep quality, respiratory rate vs personal baselines; 14-day minimum before score is shown (show "building baseline" state until then) |
 
 ---
 
 ## 16. Open Questions
 
-1. **Recovery score weighting** — the 40/30/20/10 split (HRV/RHR/sleep/RespRate) is a starting point; should it be user-adjustable or fixed?
-2. **Re-plan nudge threshold** — "3+ metrics changed by >10% of range" is an initial heuristic; needs tuning once real data is available
-3. **Longevity score formula** — simple weighted average of metric scores, or something non-linear that penalises critical Tier 1 failures more heavily?
-4. **Baseline initialisation** — Recovery Score needs a personal baseline for HRV/RHR; how many days of data are needed before the score is meaningful? (Suggest: 14-day minimum, show "building baseline" state before that)
+1. **Recovery score weighting** — the 40/30/20/10 split (HRV/RHR/sleep/RespRate) is a starting point; fixed for now, revisit after real-world use
+2. **Re-plan nudge threshold** — "3+ metrics changed by >10% of range" is an initial heuristic; tune after real data is available
 
 ---
 
-*Draft v0.3 — 2026-03-28*
+*Draft v0.4 — 2026-03-28*
