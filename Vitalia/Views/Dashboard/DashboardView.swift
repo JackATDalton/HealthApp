@@ -35,7 +35,9 @@ struct DashboardView: View {
 
                         // Metric grid
                         MetricGridView(
-                            snapshots: MetricGridView.mockSnapshots,
+                            snapshots: appState.metricSnapshot.isEmpty
+                                ? MetricGridView.mockSnapshots   // show mock until first sync
+                                : appState.metricSnapshot,
                             configs: metricConfigs
                         )
                     }
@@ -61,15 +63,16 @@ struct DashboardView: View {
                 RecoveryDetailPlaceholderView(result: appState.recoveryResult)
             }
         }
-        .onAppear {
-            appState.loadMockData()
+        .task {
+            // Sync is triggered by RootView on launch; this just ensures
+            // any manual foreground-returns re-use the already-populated state.
         }
     }
 
     private var syncButton: some View {
         Button {
             withAnimation { syncPulse.toggle() }
-            appState.loadMockData()
+            Task { await appState.sync() }
         } label: {
             Image(systemName: appState.isSyncing ? "arrow.clockwise" : "arrow.clockwise")
                 .font(.system(size: 15, weight: .medium))
