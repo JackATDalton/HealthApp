@@ -3,6 +3,8 @@ import SwiftUI
 struct MetricGridView: View {
     let snapshots: [String: Double]
     let configs: [MetricConfig]
+    var evalResults: [String: MetricEvaluator.Result] = [:]
+    var onMetricTap: ((MetricDefinition) -> Void)? = nil
 
     // Mock data for Phase 1
     static let mockSnapshots: [String: Double] = [
@@ -49,21 +51,29 @@ struct MetricGridView: View {
 
             LazyVGrid(columns: columns, spacing: VSpacing.m) {
                 ForEach(metrics) { metric in
-                    let value = snapshots[metric.id]
-                    let config = configs.first { $0.metricID == metric.id }
+                    let value     = snapshots[metric.id]
+                    let config    = configs.first { $0.metricID == metric.id }
                     let isEnabled = config?.isEnabled ?? true
-                    let status = evaluateStatus(metric: metric, value: value, config: config)
-                    let progress = evaluateProgress(metric: metric, value: value, config: config)
+                    let eval      = evalResults[metric.id]
+                    let status    = value == nil ? MetricStatus.noData : (eval?.status ?? evaluateStatus(metric: metric, value: value, config: config))
+                    let progress  = eval?.progress ?? evaluateProgress(metric: metric, value: value, config: config)
 
-                    MetricCardView(
-                        name: metric.displayName,
-                        value: formatValue(value: value, metric: metric),
-                        unit: metric.unit,
-                        tier: metric.evidenceTier.rawValue,
-                        status: value == nil ? .noData : status,
-                        progress: progress,
-                        isEnabled: isEnabled
-                    )
+                    Button {
+                        if let value, isEnabled {
+                            onMetricTap?(metric)
+                        }
+                    } label: {
+                        MetricCardView(
+                            name: metric.displayName,
+                            value: formatValue(value: value, metric: metric),
+                            unit: metric.unit,
+                            tier: metric.evidenceTier.rawValue,
+                            status: status,
+                            progress: progress,
+                            isEnabled: isEnabled
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

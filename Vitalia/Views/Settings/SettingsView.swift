@@ -4,8 +4,8 @@ import SwiftData
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
     @Query private var profiles: [UserProfile]
+    @AppStorage("preferredModel") private var selectedModel = "claude-sonnet-4-6"
     @State private var showAPIKeyEntry = false
-    @State private var selectedModel = "claude-sonnet-4-6"
     @State private var usesMetric = true
 
     private let models = ["claude-sonnet-4-6", "claude-opus-4-6"]
@@ -105,7 +105,8 @@ struct SettingsView: View {
         Button {
             showAPIKeyEntry = true
         } label: {
-            label("API Key", systemImage: "key.fill", value: "Stored in Keychain")
+            label("API Key", systemImage: "key.fill",
+                  value: KeychainManager.hasAPIKey ? "Configured" : "Not set")
         }
         .sheet(isPresented: $showAPIKeyEntry) {
             APIKeyView()
@@ -162,16 +163,19 @@ struct APIKeyView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var keyText = ""
     @State private var isRevealed = false
+    @State private var showDeleteConfirm = false
+
+    private var hasExistingKey: Bool { KeychainManager.hasAPIKey }
+    private var canSave: Bool { !keyText.isEmpty && keyText.hasPrefix("sk-ant-") }
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: VSpacing.xl) {
-                VStack(alignment: .leading, spacing: VSpacing.s) {
-                    Text("Your Claude API key is stored securely in the iOS Keychain and never leaves your device.")
-                        .font(VFont.bodyMediumFont)
-                        .foregroundStyle(VColor.textSecondary)
-                }
+                Text("Your Claude API key is stored securely in the iOS Keychain and never leaves your device.")
+                    .font(VFont.bodyMediumFont)
+                    .foregroundStyle(VColor.textSecondary)
 
+                // Input field
                 HStack {
                     Group {
                         if isRevealed {
@@ -197,11 +201,12 @@ struct APIKeyView: View {
                 .clipShape(RoundedRectangle(cornerRadius: VRadius.large))
                 .overlay(
                     RoundedRectangle(cornerRadius: VRadius.large)
-                        .strokeBorder(VColor.borderMedium, lineWidth: 1)
+                        .strokeBorder(canSave ? VColor.accent.opacity(0.5) : VColor.borderMedium, lineWidth: 1)
                 )
 
+                // Save button
                 Button {
-                    // Phase 4: save to Keychain
+                    KeychainManager.saveAPIKey(keyText)
                     dismiss()
                 } label: {
                     Text("Save Key")
@@ -209,10 +214,30 @@ struct APIKeyView: View {
                         .foregroundStyle(VColor.textInverse)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, VSpacing.l)
-                        .background(keyText.isEmpty ? VColor.disabled : VColor.accent)
+                        .background(canSave ? VColor.accent : VColor.disabled)
                         .clipShape(RoundedRectangle(cornerRadius: VRadius.xl))
                 }
-                .disabled(keyText.isEmpty)
+                .disabled(!canSave)
+
+                // Delete button (only if a key is already stored)
+                if hasExistingKey {
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        Text("Remove Saved Key")
+                            .font(VFont.bodyMediumFont)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .confirmationDialog("Remove API Key?", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
+                        Button("Remove", role: .destructive) {
+                            KeychainManager.deleteAPIKey()
+                            dismiss()
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("You will need to re-enter your key to generate plans.")
+                    }
+                }
 
                 Spacer()
             }
@@ -227,6 +252,10 @@ struct APIKeyView: View {
                     Button("Cancel") { dismiss() }
                         .foregroundStyle(VColor.accent)
                 }
+            }
+            .onAppear {
+                // Pre-fill with masked placeholder if key already exists
+                if hasExistingKey { keyText = KeychainManager.loadAPIKey() ?? "" }
             }
         }
         .presentationBackground(VColor.backgroundPrimary)

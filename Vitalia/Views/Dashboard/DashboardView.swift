@@ -5,6 +5,7 @@ struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Query private var metricConfigs: [MetricConfig]
     @State private var showRecoveryDetail = false
+    @State private var selectedMetric: MetricDefinition? = nil
     @State private var syncPulse = false
 
     var body: some View {
@@ -37,8 +38,11 @@ struct DashboardView: View {
                         snapshots: appState.metricSnapshot.isEmpty
                             ? MetricGridView.mockSnapshots
                             : appState.metricSnapshot,
-                        configs: metricConfigs
-                    )
+                        configs: metricConfigs,
+                        evalResults: appState.metricEvalResults
+                    ) { metric in
+                        selectedMetric = metric
+                    }
                 }
                 .padding(.horizontal, VSpacing.l)
                 .padding(.top, VSpacing.m)
@@ -59,7 +63,14 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $showRecoveryDetail) {
-                RecoveryDetailPlaceholderView(result: appState.recoveryResult)
+                RecoveryDetailView(result: appState.recoveryResult)
+            }
+            .sheet(item: $selectedMetric) { metric in
+                MetricDetailView(
+                    metric: metric,
+                    snapshot: appState.metricSnapshot,
+                    evalResult: appState.metricEvalResults[metric.id]
+                )
             }
         }
         .task {
@@ -98,76 +109,3 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - Recovery detail placeholder (full view in Phase 3)
-
-private struct RecoveryDetailPlaceholderView: View {
-    let result: RecoveryScoreResult?
-    @Environment(\.dismiss) private var dismiss
-
-    private var bandColor: Color {
-        switch result?.band {
-        case .recovered:      VColor.recoveryGreen
-        case .moderate:       VColor.recoveryAmber
-        case .fatigued:       VColor.recoveryOrange
-        case .underRecovered: VColor.recoveryRed
-        case nil:             VColor.textTertiary
-        }
-    }
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: VSpacing.xxl) {
-                    // Large ring
-                    if let result, !result.isIncomplete {
-                        ScoreRingView(
-                            score: result.score,
-                            color: bandColor,
-                            size: 180,
-                            lineWidth: 18,
-                            sublabel: result.band.rawValue.uppercased()
-                        )
-                        .padding(.top, VSpacing.xl)
-                    }
-
-                    // Input breakdown
-                    if let result {
-                        VStack(spacing: 0) {
-                            ForEach(Array(result.inputs.sortedInputs.enumerated()), id: \.element.name) { idx, input in
-                                StatRowView(
-                                    label: input.name,
-                                    value: input.score.map { "\(Int($0.rounded()))/100" } ?? "—",
-                                    valueColor: scoreColor(input.score ?? 0),
-                                    showDivider: idx < result.inputs.sortedInputs.count - 1
-                                )
-                                .padding(.horizontal, VSpacing.l)
-                            }
-                        }
-                        .background(VColor.backgroundSecondary)
-                        .clipShape(RoundedRectangle(cornerRadius: VRadius.xl))
-                        .padding(.horizontal, VSpacing.l)
-                    }
-                }
-                .padding(.bottom, VSpacing.huge)
-            }
-            .background(VColor.backgroundPrimary.ignoresSafeArea())
-            .navigationTitle("Recovery Score")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(VColor.backgroundPrimary, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundStyle(VColor.accent)
-                }
-            }
-        }
-        .presentationBackground(VColor.backgroundPrimary)
-    }
-
-    private func scoreColor(_ score: Double) -> Color {
-        if score >= 75 { return VColor.recoveryGreen }
-        if score >= 50 { return VColor.recoveryAmber }
-        return VColor.recoveryRed
-    }
-}

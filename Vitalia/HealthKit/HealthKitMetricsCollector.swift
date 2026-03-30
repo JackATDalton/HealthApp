@@ -18,8 +18,11 @@ final class HealthKitMetricsCollector {
 
     func collect(userAge: Int) async -> [String: Double] {
         // Run all independent queries concurrently
-        async let hrv         = fetchDailyAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"), daysBack: 2)
-        async let rhr         = fetchDailyAverage(.restingHeartRate,         unit: heartRateUnit,    daysBack: 2)
+        async let hrv         = fetchOvernightAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"))
+        async let rhr         = fetchOvernightMin(.restingHeartRate, unit: heartRateUnit)
+        async let hrvBaseline = fetchDailyAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"), daysBack: 30)
+        async let rhrBaseline = fetchDailyAverage(.restingHeartRate,         unit: heartRateUnit,    daysBack: 30)
+        async let rrBaseline  = fetchDailyAverage(.respiratoryRate,          unit: heartRateUnit,    daysBack: 30)
         async let vo2max      = fetchMax(.vo2Max,              unit: .init(from: "ml/kg*min"),       daysBack: 30)
         async let spo2        = fetchOvernightMin(.oxygenSaturation, unit: .percent())
         async let walkingHR   = fetchDailyAverage(.walkingHeartRateAverage, unit: heartRateUnit, daysBack: 7)
@@ -40,8 +43,11 @@ final class HealthKitMetricsCollector {
         async let workouts    = workoutAnalyser.fetchWorkoutResult(userAge: userAge)
 
         // Await all
-        let hrvVal      = await hrv
-        let rhrVal      = await rhr
+        let hrvVal         = await hrv
+        let rhrVal         = await rhr
+        let hrvBaselineVal = await hrvBaseline
+        let rhrBaselineVal = await rhrBaseline
+        let rrBaselineVal  = await rrBaseline
         let vo2Val      = await vo2max
         let spo2Val     = await spo2
         let walkHRVal   = await walkingHR
@@ -64,8 +70,11 @@ final class HealthKitMetricsCollector {
         var snapshot: [String: Double] = [:]
 
         // Cardiovascular
-        if let v = hrvVal     { snapshot["hrv"]             = v }
-        if let v = rhrVal     { snapshot["rhr"]             = v }
+        if let v = hrvVal         { snapshot["hrv"]             = v }
+        if let v = rhrVal         { snapshot["rhr"]             = v }
+        if let v = hrvBaselineVal { snapshot["hrv_baseline"]    = v }
+        if let v = rhrBaselineVal { snapshot["rhr_baseline"]    = v }
+        if let v = rrBaselineVal  { snapshot["rr_baseline"]     = v }
         if let v = vo2Val     { snapshot["vo2max"]          = v }   // raw; correction applied in evaluator
         if let v = spo2Val    { snapshot["spo2"]            = v * 100 }   // 0‥1 → percentage
         if let v = walkHRVal  { snapshot["walking_hr"]      = v }

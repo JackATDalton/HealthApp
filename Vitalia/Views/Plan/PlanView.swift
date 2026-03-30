@@ -3,11 +3,18 @@ import SwiftData
 
 struct PlanView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.modelContext) private var context
     @Query(sort: \LongevityPlan.createdAt, order: .reverse) private var plans: [LongevityPlan]
+    @Query private var profiles: [UserProfile]
+    @Query private var metricConfigs: [MetricConfig]
+
+    @AppStorage("preferredModel") private var preferredModel = "claude-sonnet-4-6"
+
     @State private var isGenerating = false
     @State private var streamingText = ""
-    @State private var showPromptPreview = false
     @State private var showHistory = false
+    @State private var generationError: String? = nil
+    @State private var showNoKeyAlert = false
 
     private var latestPlan: LongevityPlan? { plans.first }
 
@@ -29,7 +36,7 @@ struct PlanView: View {
             .toolbarBackground(VColor.backgroundPrimary, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
-                if !plans.isEmpty {
+                if !plans.isEmpty && !isGenerating {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             showHistory = true
@@ -42,6 +49,19 @@ struct PlanView: View {
             }
             .sheet(isPresented: $showHistory) {
                 PlanHistoryView(plans: plans)
+            }
+            .alert("API Key Required", isPresented: $showNoKeyAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Add your Anthropic API key in Settings → Claude API to generate plans.")
+            }
+            .alert("Generation Failed", isPresented: .init(
+                get: { generationError != nil },
+                set: { if !$0 { generationError = nil } }
+            )) {
+                Button("OK", role: .cancel) { generationError = nil }
+            } message: {
+                Text(generationError ?? "")
             }
         }
     }
@@ -85,19 +105,15 @@ struct PlanView: View {
                         .textCase(.uppercase)
                         .tracking(0.6)
 
-                    HStack {
-                        Text("Generated with \(plan.modelUsed)")
-                            .font(VFont.captionFont)
-                            .foregroundStyle(VColor.textTertiary)
-                        Spacer()
-                    }
+                    Text("Generated with \(plan.modelUsed)")
+                        .font(VFont.captionFont)
+                        .foregroundStyle(VColor.textTertiary)
                 }
                 .padding(.horizontal, VSpacing.l)
                 .padding(.top, VSpacing.m)
 
                 StreamingPlanBodyView(text: plan.fullText)
 
-                // Re-generate button
                 generateButton
             }
             .padding(.bottom, VSpacing.huge)
@@ -138,22 +154,111 @@ struct PlanView: View {
 
     private var generateButton: some View {
         Button {
-            // Phase 4: wire to ClaudeAPIClient
+            Task { await generatePlan() }
         } label: {
             HStack(spacing: VSpacing.s) {
                 Image(systemName: "brain.head.profile")
                     .font(.system(size: 16, weight: .semibold))
-                Text("Generate Plan")
+                Text(latestPlan == nil ? "Generate Plan" : "Regenerate Plan")
                     .font(.system(size: VFont.bodyLarge, weight: .semibold))
             }
             .foregroundStyle(VColor.textInverse)
             .frame(maxWidth: .infinity)
             .padding(.vertical, VSpacing.l)
-            .background(VColor.accent)
+            .background(isGenerating ? VColor.disabled : VColor.accent)
             .clipShape(RoundedRectangle(cornerRadius: VRadius.xl))
         }
         .padding(.horizontal, VSpacing.l)
         .disabled(isGenerating)
+    }
+
+    // MARK: - Generation
+
+    private func generatePlan() async {
+        guard let apiKey = KeychainManager.loadAPIKey(), !apiKey.isEmpty else {
+            showNoKeyAlert = true
+            return
+        }
+
+        isGenerating = true
+        streamingText = ""
+
+        let (system, userMessage) = PromptBuilder.build(
+            snapshot: appState.metricSnapshot,
+            recoveryResult: appState.recoveryResult,
+            longevityResult: appState.longevityResult,
+            profile: profiles.first,
+            configs: metricConfigs
+        )
+
+        do {
+            let stream = ClaudeAPIClient.stream(
+                apiKey: apiKey,
+                model: preferredModel,
+                system: system,
+                userMessage: userMessage
+            )
+
+            for try await chunk in stream {
+                streamingText += chunk
+            }
+
+            // Persist the completed plan
+            let plan = LongevityPlan(modelUsed: preferredModel)
+            plan.fullText = streamingText
+            plan.focusMetricID = extractFocusMetricID(from: streamingText)
+            if let encoded = try? JSONEncoder().encode(appState.metricSnapshot) {
+                plan.snapshotData = encoded
+            }
+            context.insert(plan)
+            try? context.save()
+
+            appState.onPlanSaved(plan: plan)
+
+        } catch {
+            generationError = error.localizedDescription
+        }
+
+        isGenerating = false
+    }
+
+    /// Finds `metric_id: <id>` in the Focus Metric section and validates it.
+    private func extractFocusMetricID(from text: String) -> String? {
+        let lines = text.components(separatedBy: "\n")
+        var inFocusSection = false
+
+        for line in lines {
+            if line.hasPrefix("## Focus Metric") {
+                inFocusSection = true
+                continue
+            }
+            if inFocusSection && line.hasPrefix("##") {
+                break // entered next section
+            }
+            if inFocusSection {
+                let lower = line.lowercased()
+                if lower.hasPrefix("metric_id:") {
+                    let id = line
+                        .dropFirst("metric_id:".count)
+                        .trimmingCharacters(in: .whitespaces)
+                        .lowercased()
+                    if MetricDefinition.all.contains(where: { $0.id == id }) {
+                        return id
+                    }
+                }
+            }
+        }
+
+        // Fallback: match display names anywhere in the focus section text
+        if let headerRange = text.range(of: "## Focus Metric") {
+            let after = String(text[headerRange.upperBound...])
+            for def in MetricDefinition.all {
+                if after.localizedCaseInsensitiveContains(def.displayName) {
+                    return def.id
+                }
+            }
+        }
+        return nil
     }
 }
 
@@ -199,7 +304,15 @@ struct PlanSection: Identifiable {
         for line in lines {
             if line.hasPrefix("## ") {
                 if !currentTitle.isEmpty {
-                    sections.append(PlanSection(title: currentTitle, body: currentBody.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)))
+                    let body = currentBody
+                        .joined(separator: "\n")
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                    // Strip "metric_id: ..." lines from user-visible body
+                    let cleaned = body.components(separatedBy: "\n")
+                        .filter { !$0.lowercased().hasPrefix("metric_id:") }
+                        .joined(separator: "\n")
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                    sections.append(PlanSection(title: currentTitle, body: cleaned))
                 }
                 currentTitle = String(line.dropFirst(3))
                 currentBody = []
@@ -208,7 +321,14 @@ struct PlanSection: Identifiable {
             }
         }
         if !currentTitle.isEmpty {
-            sections.append(PlanSection(title: currentTitle, body: currentBody.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)))
+            let body = currentBody
+                .joined(separator: "\n")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let cleaned = body.components(separatedBy: "\n")
+                .filter { !$0.lowercased().hasPrefix("metric_id:") }
+                .joined(separator: "\n")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            sections.append(PlanSection(title: currentTitle, body: cleaned))
         }
         return sections
     }
@@ -221,13 +341,12 @@ struct PlanSectionView: View {
 
     private var sectionIcon: String {
         switch section.title.lowercased() {
-        case let t where t.contains("summary"):   "chart.bar.doc.horizontal"
-        case let t where t.contains("priority"):  "exclamationmark.triangle.fill"
-        case let t where t.contains("action"):    "checklist"
-        case let t where t.contains("progress"):  "arrow.up.right.circle"
-        case let t where t.contains("win"):       "star.fill"
-        case let t where t.contains("focus"):     "scope"
-        default:                                   "doc.text"
+        case let t where t.contains("summary"):  "chart.bar.doc.horizontal"
+        case let t where t.contains("priority"): "exclamationmark.triangle.fill"
+        case let t where t.contains("action"):   "checklist"
+        case let t where t.contains("quick"):    "star.fill"
+        case let t where t.contains("focus"):    "scope"
+        default:                                  "doc.text"
         }
     }
 
@@ -249,7 +368,6 @@ struct PlanSectionView: View {
             }
             .padding(.horizontal, VSpacing.l)
 
-            // Body text
             Text(section.body)
                 .font(VFont.bodyLargeFont)
                 .foregroundStyle(VColor.textSecondary)

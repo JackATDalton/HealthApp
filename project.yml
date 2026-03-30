@@ -47,7 +47,6 @@ targets:
       path: Vitalia/Vitalia.entitlements
       properties:
         com.apple.developer.healthkit: true
-        com.apple.developer.healthkit.access: []
         keychain-access-groups:
           - "$(AppIdentifierPrefix)com.jackdalton.Vitalia"
     settings:

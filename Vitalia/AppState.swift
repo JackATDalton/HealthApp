@@ -15,17 +15,22 @@ final class AppState {
 
     // MARK: - Scores (populated after sync)
     var recoveryResult: RecoveryScoreResult? = nil
-    var longevityScore: Double? = nil
+    var longevityResult: LongevityScoreCalculator.Result? = nil
     var focusMetricID: String? = nil      // set from last LongevityPlan
+
+    var longevityScore: Double? { longevityResult?.score }
 
     // MARK: - Live metric snapshot (keyed by MetricDefinition.id)
     var metricSnapshot: [String: Double] = [:]
+
+    // Per-metric evaluated scores (for dashboard cards)
+    var metricEvalResults: [String: MetricEvaluator.Result] = [:]
 
     // MARK: - Re-plan nudge
     var showRePlanNudge: Bool = false
     private var snapshotAtLastPlan: [String: Double] = [:]
 
-    // MARK: - Shared HealthKit store (one instance for the app lifetime)
+    // MARK: - Shared HealthKit store
     private let hkPermissions = HealthKitPermissionsManager()
 
     // MARK: - Sync
@@ -40,43 +45,107 @@ final class AppState {
             lastSyncDate = Date()
         }
 
-        // Determine user age (needed for zone calculations)
         let age = resolveUserAge(from: modelContext)
 
-        // Fetch all metrics
+        // 1. Collect all HealthKit metrics (concurrent queries)
         let collector = HealthKitMetricsCollector(store: hkPermissions.store)
         let snapshot  = await collector.collect(userAge: age)
         metricSnapshot = snapshot
 
-        // Detect re-plan nudge
+        // 2. Calculate Recovery Score
+        let recoveryInputs = RecoveryScoreCalculator.inputs(from: snapshot)
+        let recovery       = RecoveryScoreCalculator.calculate(inputs: recoveryInputs)
+        recoveryResult     = recovery
+
+        // 3. Evaluate each metric (for dashboard card colours + longevity score)
+        let configs = (try? modelContext?.fetch(FetchDescriptor<MetricConfig>())) ?? []
+        let configMap = Dictionary(uniqueKeysWithValues: configs.map { ($0.metricID, $0) })
+
+        var evalResults: [String: MetricEvaluator.Result] = [:]
+        for def in MetricDefinition.all {
+            guard let value = snapshot[def.id] else { continue }
+            let config = configMap[def.id]
+            evalResults[def.id] = MetricEvaluator.evaluate(
+                value,
+                definition: def,
+                customLow:  config?.customRangeLow,
+                customHigh: config?.customRangeHigh
+            )
+        }
+        metricEvalResults = evalResults
+
+        // 4. Calculate Longevity Score
+        let longevity = LongevityScoreCalculator.calculate(snapshot: snapshot, configs: configs)
+        longevityResult = longevity
+
+        // 5. Save DailySnapshot to SwiftData
+        if let context = modelContext {
+            saveDailySnapshot(
+                snapshot: snapshot,
+                recovery: recovery,
+                longevityScore: longevity.score,
+                context: context
+            )
+        }
+
+        // 6. Re-plan nudge
         if !snapshotAtLastPlan.isEmpty {
             showRePlanNudge = shouldNudgeRePlan(current: snapshot, previous: snapshotAtLastPlan)
         }
-
-        // Phase 3 will wire in full score calculators here.
-        // For now: expose raw snapshot to the dashboard.
     }
 
     // MARK: - Called after a plan is saved
 
     func onPlanSaved(plan: LongevityPlan) {
-        focusMetricID       = plan.focusMetricID
-        snapshotAtLastPlan  = metricSnapshot
-        showRePlanNudge     = false
+        focusMetricID      = plan.focusMetricID
+        snapshotAtLastPlan = metricSnapshot
+        showRePlanNudge    = false
     }
 
     // MARK: - Private helpers
 
     private func resolveUserAge(from context: ModelContext?) -> Int {
-        // Try to read from SwiftData profile; fall back to 35 as a neutral default
         guard let context else { return 35 }
-        let descriptor = FetchDescriptor<UserProfile>()
-        let profiles = (try? context.fetch(descriptor)) ?? []
+        let profiles = (try? context.fetch(FetchDescriptor<UserProfile>())) ?? []
         return profiles.first?.ageYears ?? 35
     }
 
+    private func saveDailySnapshot(
+        snapshot: [String: Double],
+        recovery: RecoveryScoreResult,
+        longevityScore: Double,
+        context: ModelContext
+    ) {
+        let today = Calendar.current.startOfDay(for: Date())
+
+        // Upsert: update existing snapshot for today if it exists
+        let descriptor = FetchDescriptor<DailySnapshot>(
+            predicate: #Predicate { $0.date == today }
+        )
+        let existing = (try? context.fetch(descriptor))?.first
+
+        let ds = existing ?? {
+            let new = DailySnapshot(date: today)
+            context.insert(new)
+            return new
+        }()
+
+        ds.metricValues = snapshot
+        ds.recoveryScore = recovery.isIncomplete ? nil : recovery.score
+        ds.recoveryBand  = recovery.band
+        ds.recoveryIncompleteReasons = recovery.incompleteReasons
+        ds.longevityScore = longevityScore
+        ds.syncedAt = Date()
+
+        // Encode recovery inputs
+        if let data = try? JSONEncoder().encode(recovery.inputs) {
+            ds.recoveryInputsData = data
+        }
+
+        try? context.save()
+    }
+
     private func shouldNudgeRePlan(current: [String: Double], previous: [String: Double]) -> Bool {
-        // Nudge if 3+ metrics have shifted by more than 10% of their optimal range
         var changedCount = 0
         for def in MetricDefinition.all {
             guard let curr = current[def.id], let prev = previous[def.id] else { continue }
@@ -91,8 +160,7 @@ final class AppState {
                 continue
             }
             guard rangeSpan > 0 else { continue }
-            let shift = abs(curr - prev) / rangeSpan
-            if shift > 0.10 { changedCount += 1 }
+            if abs(curr - prev) / rangeSpan > 0.10 { changedCount += 1 }
         }
         return changedCount >= 3
     }
