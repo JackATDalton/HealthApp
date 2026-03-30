@@ -179,12 +179,12 @@ struct MetricDefinition: Identifiable {
               description: "Aggregate training stress from the last 7 days (HR × duration).",
               longevityContext: "Helps identify load/recovery imbalances. Contextualises recovery score — sustained high load with low recovery signals overtraining."),
 
-        .init(id: "stand_hours", displayName: "Active Hours", unit: "hrs/day",
+        .init(id: "stand_hours", displayName: "Stand Hours", unit: "hrs/day",
               category: .activity, evidenceTier: .tier2,
               optimalLow: 12, optimalHigh: nil,
               higherIsBetter: true,
-              description: "Hours per day with at least 1 minute of movement.",
-              longevityContext: "Prolonged sitting is an independent risk factor even in otherwise active individuals. Breaking sedentary time improves insulin sensitivity."),
+              description: "Average daily hours in which you stood for at least 1 minute (Apple Watch Stand ring). 30-day average.",
+              longevityContext: "Prolonged sitting is an independent risk factor even in otherwise active individuals. Breaking sedentary time every hour improves postprandial glucose, endothelial function, and NEAT. 12+ stand hours/day = full ring completion."),
 
         // MARK: - Body Composition
         .init(id: "body_weight_trend", displayName: "Weight Trend", unit: "kg",

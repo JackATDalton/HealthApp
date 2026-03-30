@@ -196,9 +196,9 @@ The curve is intentionally steep near the edges of optimal (motivating small imp
 
 ---
 
-**Active Hours / Day** | Tier 2 | `≥ 12 hrs/day` with movement (30-day average)
-- *What it measures:* Average daily hours in which at least 1 minute of movement occurred (Apple Watch stand/move rings). 30-day daily average.
-- *Optimal:* ≥ 12 hours (no upper penalty)
+**Stand Hours / Day** | Tier 2 | `≥ 12 hrs/day` (30-day average)
+- *What it measures:* Average number of hours per day in which you stood for at least 1 minute, sourced from `HKCategoryType(.appleStandHour)` — the same data that drives the Apple Watch Stand ring. 12 stand hours/day = ring completion. 30-day daily average.
+- *Optimal:* ≥ 12 hours (no upper penalty — scoring 100 at exactly 12)
 - *Evidence:* Sedentary behaviour is an independent mortality risk factor even in those meeting exercise guidelines (Biswas et al., Ann Intern Med 2015). Breaking up sitting time every 30–60 minutes improves postprandial glucose, endothelial function, and NEAT (non-exercise activity thermogenesis). 12 active hours out of a ~16-hour waking day is achievable and reflects the target of no more than 4 consecutive inactive hours.
 
 ---

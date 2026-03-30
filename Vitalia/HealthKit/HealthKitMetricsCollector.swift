@@ -30,7 +30,7 @@ final class HealthKitMetricsCollector {
         async let steps       = fetchDailyAverageSum(.stepCount,        unit: .count(),     daysBack: 30)
         async let activeEnergy = fetchDailyAverageSum(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 30)
         async let respRate    = fetchOvernightAverage(.respiratoryRate, unit: heartRateUnit)
-        async let standTime   = fetchDailyAverageSum(.appleStandTime,   unit: .minute(),    daysBack: 30)
+        async let standHours  = fetchAverageDailyStandHours(daysBack: 30)
         async let bodyMass    = fetchLatestSample(.bodyMass,          unit: .gramUnit(with: .kilo))
         async let heightM     = fetchLatestSample(.height,            unit: .meter())
         async let bodyFat     = fetchLatestSample(.bodyFatPercentage, unit: .percent())
@@ -55,7 +55,7 @@ final class HealthKitMetricsCollector {
         let stepsVal       = await steps
         let energyVal      = await activeEnergy
         let rrVal          = await respRate
-        let standVal       = await standTime
+        let standVal       = await standHours
         let massVal        = await bodyMass
         let heightVal      = await heightM
         let fatVal         = await bodyFat
@@ -85,7 +85,7 @@ final class HealthKitMetricsCollector {
         // Activity — all 30-day daily averages
         if let v = stepsVal       { snapshot["steps"]             = v }
         if let v = energyVal      { snapshot["active_energy"]     = v }
-        if let v = standVal       { snapshot["stand_hours"]       = v / 60 }    // avg daily minutes → hours
+        if let v = standVal       { snapshot["stand_hours"]       = v }          // already in hours
         snapshot["zone2_minutes"]     = workResult.zone2MinutesWeekly
         snapshot["vigorous_minutes"]  = workResult.vigorousMinutesWeekly
         snapshot["strength_sessions"] = workResult.strengthSessionsWeekly
@@ -297,6 +297,32 @@ final class HealthKitMetricsCollector {
                 options: .discreteAverage
             ) { _, stats, _ in
                 continuation.resume(returning: stats?.averageQuantity()?.doubleValue(for: .degreeCelsius()))
+            }
+            store.execute(query)
+        }
+    }
+
+    /// Average daily stand hours over the last N days, counted from Apple Watch Stand ring.
+    /// Each HKCategorySample with value == HKCategoryValueAppleStandHour.stood (0)
+    /// represents one hour where the user stood for at least 1 minute.
+    private func fetchAverageDailyStandHours(daysBack: Int) async -> Double? {
+        await withCheckedContinuation { continuation in
+            let start = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
+            let predicate = HKQuery.predicateForSamples(withStart: start, end: Date())
+
+            let query = HKSampleQuery(
+                sampleType: HKCategoryType(.appleStandHour),
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: nil
+            ) { _, samples, _ in
+                guard let samples = samples as? [HKCategorySample] else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                // Count only hours where the user actually stood (value == 0 = .stood)
+                let stoodCount = samples.filter { $0.value == HKCategoryValueAppleStandHour.stood.rawValue }.count
+                continuation.resume(returning: Double(stoodCount) / Double(daysBack))
             }
             store.execute(query)
         }
