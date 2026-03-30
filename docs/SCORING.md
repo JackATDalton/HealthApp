@@ -129,7 +129,7 @@ The curve is intentionally steep near the edges of optimal (motivating small imp
 
 ---
 
-**Awake During Night** | Tier 1 | `0–5% of night` optimal
+**Awake During Night** | Tier 1 | `0–8% of night` optimal
 - *What it measures:* Percentage of time in bed spent awake (awakenings and time to fall asleep).
 - *Optimal:* ≤ 5% (lower is better)
 - *Evidence:* Frequent awakenings disrupt sleep architecture continuity and are associated with elevated cortisol, increased sympathetic tone, and inflammatory markers. Values below 5% indicate essentially consolidated sleep. Above 10% is a clinical threshold for sleep fragmentation. This metric captures what sleep efficiency misses when time-in-bed is very long.

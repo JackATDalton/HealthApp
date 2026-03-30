@@ -117,10 +117,10 @@ struct MetricDefinition: Identifiable {
 
         .init(id: "awake_pct", displayName: "Awake During Night", unit: "% of night",
               category: .sleep, evidenceTier: .tier1,
-              optimalLow: 0, optimalHigh: 5,
+              optimalLow: 0, optimalHigh: 8,
               higherIsBetter: false,
               description: "Percentage of time in bed spent awake.",
-              longevityContext: "Frequent awakenings disrupt restorative sleep cycles and are associated with elevated cortisol and inflammation."),
+              longevityContext: "Frequent awakenings disrupt restorative sleep cycles and are associated with elevated cortisol and inflammation. Up to 8% is normal healthy variation; above 10% signals meaningful fragmentation."),
 
         .init(id: "sleep_debt", displayName: "5-Day Sleep Debt", unit: "min",
               category: .sleep, evidenceTier: .tier1,
