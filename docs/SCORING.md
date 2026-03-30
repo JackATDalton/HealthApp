@@ -175,10 +175,17 @@ The curve is intentionally steep near the edges of optimal (motivating small imp
 
 ---
 
-**Vigorous / Week** | Tier 1 | `20–30 min/week` (30-day average)
+**Vigorous / Week** | Tier 1 | `≥ 75 min/week` (30-day average)
 - *What it measures:* Minutes per week above 80% max HR. Averaged over 30 days.
-- *Optimal:* 20–30 min/week
-- *Evidence:* High-intensity intervals provide VO₂ Max ceiling extension and insulin sensitisation beyond what Zone 2 alone achieves (Helgerud et al., Medicine & Science in Sports & Exercise 2007). The WHO physical activity guidelines identify 75 min/week of vigorous activity as the minimum. However, beyond ~30 min/week for non-athletes, marginal returns diminish and recovery cost increases, hence the upper bound. This is not a hard penalty — borderline status applies 30–60 min/week, not a cliff.
+- *Optimal:* ≥ 75 min/week (no upper penalty)
+- *Vigorous intensity definition:* Both the NHS and WHO define vigorous intensity activity as effort hard enough that you can only say a few words without pausing for breath. Examples include running, fast cycling, swimming, uphill walking, football, skipping, aerobics, gymnastics, and martial arts. The ACSM maps this to 77–93% of maximum heart rate. The app uses >80% max HR as a conservative proxy that sits within this range and specifically targets the intensity at which VO₂ Max adaptation is strongest.
+- *Evidence:*
+  - **WHO Physical Activity Guidelines (2020):** Adults should accumulate at least 75–150 min/week of vigorous-intensity aerobic activity, or an equivalent combination with moderate activity. This is the established population-level minimum for meaningful health benefit.
+  - **NHS guidelines** echo the same threshold and explicitly state that 75 min vigorous = 150 min moderate in terms of health outcomes.
+  - **Gebel et al. (2015, JAMA Internal Medicine, n=204,542):** Replacing moderate with vigorous activity reduced all-cause mortality independently of total exercise volume (HR 0.91 per 30% replacement). Higher proportion of vigorous activity was independently protective after full adjustment for total MET-hours.
+  - **Helgerud et al. (2007, Medicine & Science in Sports & Exercise):** Four weeks of 4×4-minute intervals at 90–95% max HR produced twice the VO₂ Max improvement of equivalent-calorie moderate training. High-intensity work above the lactate threshold is the primary stimulus for VO₂ Max ceiling extension beyond what Zone 2 alone achieves.
+  - **O'Donovan et al. (2017, JAMA Internal Medicine, n=63,591):** "Weekend warrior" pattern (1–2 sessions/week of vigorous activity meeting the 75-min guideline) conferred similar mortality reduction to spread-out vigorous activity — consistent with a dose-threshold rather than frequency effect.
+- *Note:* The 80% maxHR threshold measures the upper portion of the vigorous range. Someone doing 75 min/week of vigorous activity at 77–80% maxHR may not have all of it captured by this metric. If vigorous minutes seem lower than expected, the effort level may be slightly below the app's detection threshold — increasing intensity until speaking more than a few words feels difficult is the target.
 
 ---
 
@@ -215,10 +222,10 @@ The curve is intentionally steep near the edges of optimal (motivating small imp
 
 ---
 
-**Weight Trend** | Tier 2 | No scored range (informational)
-- *What it measures:* Latest body weight in kg from HealthKit. Scored without a fixed optimal since a healthy weight is highly individual (depends on height, muscle mass, and sex).
-- *Scoring:* Contributes a neutral score to the Longevity Score. Its primary value is showing Claude your absolute weight for plan personalisation, and flagging large changes over time. Use BMI for scored evaluation of body composition status.
-- *Evidence:* Unintentional weight loss > 5% of body weight over 6–12 months is a clinical red flag for underlying illness. Weight stability within a healthy range is a more actionable longevity target than any single absolute weight.
+**Weight Stability** | Tier 2 | `≤ 5% change` vs 6 months ago
+- *What it measures:* Absolute % change in body weight comparing a 14-day recent average to a 30-day window centred 6 months ago. Scores 100 for ≤5% change; decays with the standard piecewise curve for larger changes.
+- *Excluded from Longevity Score:* This metric is shown on the dashboard and scored independently but does not contribute to the Longevity Score, since weight change is context-dependent (intentional loss vs illness-driven loss vs muscle gain).
+- *Evidence:* Unintentional weight loss >5% of body weight over 6–12 months is a recognised clinical red flag (NICE guidelines; Nickel et al., JAMA 2023) associated with underlying malignancy, malabsorption, depression, and all-cause mortality. Weight stability within a healthy range is a more actionable longevity target than any single absolute weight value.
 
 ---
 
@@ -338,14 +345,14 @@ debt ≤ 0 min    →  100
 
 **Respiratory Rate Score**
 
-Scored as deviation from personal 30-day RR baseline:
+Only elevation above baseline is penalised. A lower rate than usual reflects deeper relaxation or better cardiorespiratory efficiency and scores 100.
 
 ```
-deviation = abs(tonight_RR − baseline_RR)
+delta = tonight_RR − baseline_RR   (negative = lower than usual = no penalty)
 
-dev ≤ 0.5       →  100
-0.5–2.0         →  100 − (dev − 0.5) / 1.5 × 50
-> 2.0           →  max(0, 50 − (dev − 2.0) × 15)
+delta ≤ 0.5     →  100
+0.5–2.0         →  100 − (delta − 0.5) / 1.5 × 50
+> 2.0           →  max(0, 50 − (delta − 2.0) × 15)
 ```
 
 ---

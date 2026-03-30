@@ -31,7 +31,6 @@ final class HealthKitMetricsCollector {
         async let steps       = fetchDailyAverageSum(.stepCount,        unit: .count(),     daysBack: 30)
         async let activeEnergy = fetchDailyAverageSum(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 30)
         async let respRate    = fetchOvernightAverage(.respiratoryRate, unit: heartRateUnit)
-        async let standHours  = fetchAverageDailyStandHours(daysBack: 30)
         async let weightChange = fetchWeightChangePercent6M()
         async let bodyMass    = fetchLatestSample(.bodyMass,          unit: .gramUnit(with: .kilo))
         async let heightM     = fetchLatestSample(.height,            unit: .meter())
@@ -58,7 +57,6 @@ final class HealthKitMetricsCollector {
         let stepsVal       = await steps
         let energyVal      = await activeEnergy
         let rrVal          = await respRate
-        let standVal       = await standHours
         let weightChangeVal = await weightChange
         let massVal        = await bodyMass
         let heightVal      = await heightM
@@ -90,7 +88,6 @@ final class HealthKitMetricsCollector {
         // Activity — all 30-day daily averages
         if let v = stepsVal       { snapshot["steps"]             = v }
         if let v = energyVal      { snapshot["active_energy"]     = v }
-        if let v = standVal       { snapshot["stand_hours"]       = v }          // already in hours
         snapshot["zone2_minutes"]     = workResult.zone2MinutesWeekly
         snapshot["vigorous_minutes"]  = workResult.vigorousMinutesWeekly
         snapshot["strength_sessions"] = workResult.strengthSessionsWeekly
@@ -346,31 +343,6 @@ final class HealthKitMetricsCollector {
         return sqrt(variance)
     }
 
-    /// Average daily stand hours over the last N days, counted from Apple Watch Stand ring.
-    /// Each HKCategorySample with value == HKCategoryValueAppleStandHour.stood (0)
-    /// represents one hour where the user stood for at least 1 minute.
-    private func fetchAverageDailyStandHours(daysBack: Int) async -> Double? {
-        await withCheckedContinuation { continuation in
-            let start = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
-            let predicate = HKQuery.predicateForSamples(withStart: start, end: Date())
-
-            let query = HKSampleQuery(
-                sampleType: HKCategoryType(.appleStandHour),
-                predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
-            ) { _, samples, _ in
-                guard let samples = samples as? [HKCategorySample] else {
-                    continuation.resume(returning: nil)
-                    return
-                }
-                // Count only hours where the user actually stood (value == 0 = .stood)
-                let stoodCount = samples.filter { $0.value == HKCategoryValueAppleStandHour.stood.rawValue }.count
-                continuation.resume(returning: Double(stoodCount) / Double(daysBack))
-            }
-            store.execute(query)
-        }
-    }
 
     /// Absolute % change in body weight between recent 14-day average and 6-month-ago 30-day window.
     /// Returns nil if either window has no data.

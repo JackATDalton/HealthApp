@@ -323,7 +323,7 @@ struct MetricDetailView: View {
     private var isBarChart: Bool {
         switch metric.id {
         case "steps", "zone2_minutes", "vigorous_minutes", "strength_sessions",
-             "training_load", "mindful_minutes", "daylight_exposure", "stand_hours":
+             "training_load", "mindful_minutes", "daylight_exposure":
             return true
         default: return false
         }

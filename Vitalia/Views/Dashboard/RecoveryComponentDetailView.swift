@@ -255,7 +255,7 @@ struct RecoveryComponentDetailView: View {
                 (label: "30-day average", value: baseline, highlight: false),
                 (label: "Deviation",      value: devStr,  highlight: false),
             ],
-            scoringExplanation: "Deviation from your personal baseline is scored. Within ±0.5 br/min → 100. Between 0.5–2.0 br/min deviation → 50–100. Beyond 2.0 br/min deviation drops steeply. Elevated respiratory rate overnight is an early indicator of illness or physiological stress before other symptoms appear.",
+            scoringExplanation: "Only elevation above your baseline is penalised — a lower rate than usual is a positive sign of deeper relaxation or improved cardiorespiratory efficiency. Within 0.5 br/min above baseline → 100. 0.5–2.0 br/min above → 50–100. Beyond 2.0 br/min above baseline drops steeply. Elevated respiratory rate overnight is an early indicator of illness or physiological stress before other symptoms appear.",
             improvementTip: "A consistently elevated respiratory rate (multiple nights) may be an early warning of illness or overtraining. Consider reducing training load and monitoring other recovery signals."
         )
     }

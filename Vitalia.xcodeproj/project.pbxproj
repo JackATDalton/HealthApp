@@ -11,6 +11,7 @@
 		0AE4FC8A97ED8E66B9E5ECE3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB5AE06436E9D234A5F4700 /* ContentView.swift */; };
 		0DC60BF430EBB20EA3898442 /* HealthKitProfileImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5FCC26C020395AEE807F00 /* HealthKitProfileImporter.swift */; };
 		131F8E9049D54F7FD32F7A67 /* OnboardingFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0889B56ECC42DD8D6C598280 /* OnboardingFlowUITests.swift */; };
+		17F0E6F4803F2DF42ED1A348 /* MetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4D391EC569906429948E843 /* MetricsSettingsView.swift */; };
 		1A8238B0E963EB82ECBDD194 /* HealthKitWorkoutAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DFE392076C4E9A1C4687F /* HealthKitWorkoutAnalyser.swift */; };
 		1C63D915D6D3432C74588B0A /* RecoveryScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86CEAB1B2BCD52577BF49063 /* RecoveryScoreCard.swift */; };
 		1D3DB01761300F101FB3086D /* TierBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25672A308D1AFC00993321A6 /* TierBadgeView.swift */; };
@@ -35,6 +36,8 @@
 		7A7DD8CB4B982D3A4F2EFE1E /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C02A486DDC3786B43FA5C3 /* OnboardingContainerView.swift */; };
 		7AE643986A068F9C4D72EC76 /* RecoveryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DF84FCE7B0190695141C5 /* RecoveryDetailView.swift */; };
 		802B47A592044ED561AE7528 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 05ABE07F384CCF899D60A112 /* Assets.xcassets */; };
+		8238D15B8F96ADC221604608 /* LongevityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF5B15CF6F3A84DE307F449 /* LongevityDetailView.swift */; };
+		964A2138510E4017B44AA00B /* HealthKitHistoryFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634A0BB97E9ADA12E17DC487 /* HealthKitHistoryFetcher.swift */; };
 		968BDC768899F631CDCE2671 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC72C17ED1B4E9642BD102F /* SettingsView.swift */; };
 		9743363D24C857F8463999AD /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6896F716E104431732104130 /* KeychainManager.swift */; };
 		9AAAF5393F68B7416E6D3214 /* DailySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C37FE36422005BA830ECAB4 /* DailySnapshot.swift */; };
@@ -51,6 +54,7 @@
 		E21F9D2FAC88DD9EEF46A444 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFAF71D091D1526170F5ED3A /* UserProfile.swift */; };
 		E58D22813D7B36D9C643D1EC /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F93537384EEDC792CA1D623 /* Spacing.swift */; };
 		E679883B6188D95BD108DCE0 /* PromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D3553AADEF65E8DE112B81 /* PromptBuilder.swift */; };
+		E6839C4C34645BCD755DD4EC /* RecoveryComponentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB0F075EEB5E39799B58ED6 /* RecoveryComponentDetailView.swift */; };
 		E9737BACDF2ED8FD373C6C3C /* MetricDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942169B7C3F21502F87882A3 /* MetricDetailView.swift */; };
 		EB791B83C19FFF04D687BD88 /* PulsingDotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B99E05D5575CA31155BD0E /* PulsingDotView.swift */; };
 		EF900077E2603593D0570B3A /* RecoveryScoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2DDC03902F57B147CF50C13 /* RecoveryScoreTests.swift */; };
@@ -82,7 +86,7 @@
 		05AB62044B43B5276BC384F7 /* RecoveryScoreResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScoreResult.swift; sourceTree = "<group>"; };
 		05ABE07F384CCF899D60A112 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0889B56ECC42DD8D6C598280 /* OnboardingFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowUITests.swift; sourceTree = "<group>"; };
-		0E44D255E686EB736E0D76D8 /* VitaliaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VitaliaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E44D255E686EB736E0D76D8 /* VitaliaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; name = VitaliaUITests.xctest; path = Vitalia.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1AF0A496E7488ECDF5232708 /* MetricCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricCardView.swift; sourceTree = "<group>"; };
 		21ADFDD3CE6401A3C86724F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		238DD9378576E4F09DF5D98D /* StatRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatRowView.swift; sourceTree = "<group>"; };
@@ -90,26 +94,29 @@
 		25672A308D1AFC00993321A6 /* TierBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierBadgeView.swift; sourceTree = "<group>"; };
 		2AB9A1BA6E6B82216CD6A2CE /* FocusMetricCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMetricCard.swift; sourceTree = "<group>"; };
 		3111AA65BA0ABBE5F5F6B2F1 /* ClaudeAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeAPIClient.swift; sourceTree = "<group>"; };
-		321D2BB0353841038B8AC14B /* Vitalia.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Vitalia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		321D2BB0353841038B8AC14B /* Vitalia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vitalia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A0D7CE4E96B25B588C12A9 /* TrendAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendAnalyser.swift; sourceTree = "<group>"; };
 		3D388648662722A1C0FEBE01 /* LongevityPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongevityPlan.swift; sourceTree = "<group>"; };
-		3D93D2CB24AB6019A10A3416 /* VitaliaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VitaliaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D93D2CB24AB6019A10A3416 /* VitaliaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; name = VitaliaTests.xctest; path = Vitalia.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DA74564A23EEA00DFD80EFA /* SwiftDataContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataContainer.swift; sourceTree = "<group>"; };
 		46D3553AADEF65E8DE112B81 /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
 		4D90051E3915F475FA947EA4 /* MetricEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricEvaluator.swift; sourceTree = "<group>"; };
 		5593772984579CDA9302B759 /* OnboardingProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingProfileView.swift; sourceTree = "<group>"; };
 		57549F6860D226A2C9476CF0 /* VitaliaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitaliaApp.swift; sourceTree = "<group>"; };
 		5FCA6BA00989E82556F7CD46 /* RePlanNudgeBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RePlanNudgeBanner.swift; sourceTree = "<group>"; };
+		634A0BB97E9ADA12E17DC487 /* HealthKitHistoryFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitHistoryFetcher.swift; sourceTree = "<group>"; };
 		6893B5A3BDD49D5BF67ECE01 /* Vitalia.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Vitalia.entitlements; sourceTree = "<group>"; };
 		6896F716E104431732104130 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		69B9FA2EC4AD84D30973BC66 /* OnboardingMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMetricsView.swift; sourceTree = "<group>"; };
 		69C02A486DDC3786B43FA5C3 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		6A54D208D50E7E8CBD6B7956 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		6BB0F075EEB5E39799B58ED6 /* RecoveryComponentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryComponentDetailView.swift; sourceTree = "<group>"; };
 		6E5FCC26C020395AEE807F00 /* HealthKitProfileImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitProfileImporter.swift; sourceTree = "<group>"; };
 		75910582368CD334AA8C23C1 /* PlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
 		802255ACAA18A7DD0D59762C /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		809472766D33E1F5BC198415 /* HealthKitPassiveReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitPassiveReader.swift; sourceTree = "<group>"; };
 		86CEAB1B2BCD52577BF49063 /* RecoveryScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScoreCard.swift; sourceTree = "<group>"; };
+		8BF5B15CF6F3A84DE307F449 /* LongevityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongevityDetailView.swift; sourceTree = "<group>"; };
 		8F1465176D575A18A3EE6624 /* PlanHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanHistoryView.swift; sourceTree = "<group>"; };
 		8F93537384EEDC792CA1D623 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		922E1E86E5922E62B4763248 /* MetricGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricGridView.swift; sourceTree = "<group>"; };
@@ -117,6 +124,7 @@
 		9B6DF84FCE7B0190695141C5 /* RecoveryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryDetailView.swift; sourceTree = "<group>"; };
 		9C37FE36422005BA830ECAB4 /* DailySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySnapshot.swift; sourceTree = "<group>"; };
 		A0FD143375BB819D9C499EBD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		A4D391EC569906429948E843 /* MetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSettingsView.swift; sourceTree = "<group>"; };
 		A70FB7E3DE18D520B81E4CC6 /* RecoveryScoreCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScoreCalculator.swift; sourceTree = "<group>"; };
 		A9B99E05D5575CA31155BD0E /* PulsingDotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulsingDotView.swift; sourceTree = "<group>"; };
 		AA7C18709AACC8748D1262C7 /* HealthKitSleepAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSleepAnalyser.swift; sourceTree = "<group>"; };
@@ -258,6 +266,7 @@
 		73973C1199F4B53A052B80B4 /* HealthKit */ = {
 			isa = PBXGroup;
 			children = (
+				634A0BB97E9ADA12E17DC487 /* HealthKitHistoryFetcher.swift */,
 				E72EDDA819210CD507C4EDC1 /* HealthKitMetricsCollector.swift */,
 				809472766D33E1F5BC198415 /* HealthKitPassiveReader.swift */,
 				B159D35050E9FA94F77DD63D /* HealthKitPermissionsManager.swift */,
@@ -339,9 +348,11 @@
 			children = (
 				6A54D208D50E7E8CBD6B7956 /* DashboardView.swift */,
 				2AB9A1BA6E6B82216CD6A2CE /* FocusMetricCard.swift */,
+				8BF5B15CF6F3A84DE307F449 /* LongevityDetailView.swift */,
 				23D57F9326AF38845E28DE41 /* LongevityScoreCard.swift */,
 				942169B7C3F21502F87882A3 /* MetricDetailView.swift */,
 				922E1E86E5922E62B4763248 /* MetricGridView.swift */,
+				6BB0F075EEB5E39799B58ED6 /* RecoveryComponentDetailView.swift */,
 				9B6DF84FCE7B0190695141C5 /* RecoveryDetailView.swift */,
 				86CEAB1B2BCD52577BF49063 /* RecoveryScoreCard.swift */,
 				5FCA6BA00989E82556F7CD46 /* RePlanNudgeBanner.swift */,
@@ -359,6 +370,7 @@
 		FB6AEB5502D052E01F15E093 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				A4D391EC569906429948E843 /* MetricsSettingsView.swift */,
 				AEC72C17ED1B4E9642BD102F /* SettingsView.swift */,
 			);
 			path = Settings;
@@ -431,7 +443,6 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					04A74775E55C7A69BECF52B1 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					1E776FABE1B792D17D4721DE = {
@@ -505,6 +516,7 @@
 				9AAAF5393F68B7416E6D3214 /* DailySnapshot.swift in Sources */,
 				34650C7C9821F83A54F7802C /* DashboardView.swift in Sources */,
 				5B2D8101299D87D9A3BDE3CF /* FocusMetricCard.swift in Sources */,
+				964A2138510E4017B44AA00B /* HealthKitHistoryFetcher.swift in Sources */,
 				BEBE80D853504667D2417F40 /* HealthKitMetricsCollector.swift in Sources */,
 				F543A1A284F290098A24694C /* HealthKitPassiveReader.swift in Sources */,
 				9B51943108AC8D0E3111672C /* HealthKitPermissionsManager.swift in Sources */,
@@ -512,6 +524,7 @@
 				F31865A73360BB45A3A89520 /* HealthKitSleepAnalyser.swift in Sources */,
 				1A8238B0E963EB82ECBDD194 /* HealthKitWorkoutAnalyser.swift in Sources */,
 				9743363D24C857F8463999AD /* KeychainManager.swift in Sources */,
+				8238D15B8F96ADC221604608 /* LongevityDetailView.swift in Sources */,
 				450FC77A3B8357B23415E4B9 /* LongevityPlan.swift in Sources */,
 				C2B8CEDB4BCB04CDC3DB559E /* LongevityScoreCalculator.swift in Sources */,
 				4352E6512C2A35CE07EE7952 /* LongevityScoreCard.swift in Sources */,
@@ -521,6 +534,7 @@
 				E9737BACDF2ED8FD373C6C3C /* MetricDetailView.swift in Sources */,
 				D3B61A2475D88F2CB1E54B45 /* MetricEvaluator.swift in Sources */,
 				32C680E8BCA4F783C4FC995A /* MetricGridView.swift in Sources */,
+				17F0E6F4803F2DF42ED1A348 /* MetricsSettingsView.swift in Sources */,
 				7A7DD8CB4B982D3A4F2EFE1E /* OnboardingContainerView.swift in Sources */,
 				5869CD97B2170B21CDAFA927 /* OnboardingMetricsView.swift in Sources */,
 				6B6A57FA23C498996195281A /* OnboardingProfileView.swift in Sources */,
@@ -530,6 +544,7 @@
 				E679883B6188D95BD108DCE0 /* PromptBuilder.swift in Sources */,
 				EB791B83C19FFF04D687BD88 /* PulsingDotView.swift in Sources */,
 				4C51DED43CEAB47177CF22A2 /* RePlanNudgeBanner.swift in Sources */,
+				E6839C4C34645BCD755DD4EC /* RecoveryComponentDetailView.swift in Sources */,
 				7AE643986A068F9C4D72EC76 /* RecoveryDetailView.swift in Sources */,
 				40A8671F3C7E1C8660C24FF7 /* RecoveryScoreCalculator.swift in Sources */,
 				1C63D915D6D3432C74588B0A /* RecoveryScoreCard.swift in Sources */,
@@ -692,6 +707,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Vitalia/Vitalia.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = VARUH939ZA;
 				INFOPLIST_FILE = Vitalia/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -791,6 +807,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Vitalia/Vitalia.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = VARUH939ZA;
 				INFOPLIST_FILE = Vitalia/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -179,12 +179,12 @@ enum RecoveryScoreCalculator {
     private static func scoreRespiratoryRate(_ i: Inputs) -> Double? {
         guard let rr = i.respiratoryRate else { return nil }
         let baseline = i.rrBaseline ?? 14.0
-        let dev = abs(rr - baseline)
+        let delta = rr - baseline   // positive = elevated (bad), negative = lower (neutral/good)
         let score: Double
-        switch dev {
-        case ...0.5:    score = 100
-        case 0.5..<2.0: score = 100 - (dev - 0.5) / 1.5 * 50
-        default:        score = max(0, 50 - (dev - 2.0) * 15)
+        switch delta {
+        case ...0.5:    score = 100             // at or below baseline — no penalty
+        case 0.5..<2.0: score = 100 - (delta - 0.5) / 1.5 * 50
+        default:        score = max(0, 50 - (delta - 2.0) * 15)
         }
         return max(0, min(100, score))
     }

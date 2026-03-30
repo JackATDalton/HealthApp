@@ -138,7 +138,6 @@ enum PromptBuilder {
         }
         lines.append("Overall: \(Int(r.score))/100")
         lines.append("Weighted average: \(Int(r.weightedAverage.rounded()))/100")
-        lines.append("Minimum Tier-1 score: \(Int(r.minTier1Score.rounded()))/100")
         return lines.joined(separator: "\n")
     }
 

@@ -105,8 +105,6 @@ final class HealthKitHistoryFetcher {
         // Activity
         case "steps":
             return await quantityStats(.stepCount, unit: .count(), options: .cumulativeSum, range: range)
-        case "stand_hours":
-            return await standHourHistory(range: range)
         case "daylight_exposure":
             return await quantityStats(.timeInDaylight, unit: .second(), options: .cumulativeSum, range: range, scale: 1.0 / 60.0)
         case "mindful_minutes":
@@ -182,17 +180,6 @@ final class HealthKitHistoryFetcher {
             }
             self.store.execute(query)
         }
-    }
-
-    // MARK: - Stand Hours
-
-    private func standHourHistory(range: MetricTimeRange) async -> [HistoryPoint] {
-        let samples = await categorySamples(.appleStandHour, from: range.startDate, to: Date())
-        let pairs = samples
-            .filter { $0.value == HKCategoryValueAppleStandHour.stood.rawValue }
-            .map { (Calendar.current.startOfDay(for: $0.startDate), 1.0) }
-        // Sum stood-hours per period
-        return aggregateByPeriod(pairs, range: range) { $0.reduce(0, +) }
     }
 
     // MARK: - Mindful Minutes

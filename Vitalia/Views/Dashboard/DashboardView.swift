@@ -5,6 +5,7 @@ struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Query private var metricConfigs: [MetricConfig]
     @State private var showRecoveryDetail = false
+    @State private var showLongevityDetail = false
     @State private var selectedMetric: MetricDefinition? = nil
     @State private var syncPulse = false
 
@@ -17,11 +18,18 @@ struct DashboardView: View {
                         showRecoveryDetail = true
                     }
 
-                    LongevityScoreCard(score: appState.longevityScore)
+                    LongevityScoreCard(score: appState.longevityScore) {
+                        showLongevityDetail = true
+                    }
 
                     // Focus metric (from last plan)
                     if let _ = appState.focusMetricID {
-                        FocusMetricCard(metricID: appState.focusMetricID)
+                        FocusMetricCard(metricID: appState.focusMetricID) {
+                            if let id = appState.focusMetricID,
+                               let def = MetricDefinition.definition(for: id) {
+                                selectedMetric = def
+                            }
+                        }
                     }
 
                     // Re-plan nudge
@@ -64,6 +72,15 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showRecoveryDetail) {
                 RecoveryDetailView(result: appState.recoveryResult, snapshot: appState.metricSnapshot)
+            }
+            .sheet(isPresented: $showLongevityDetail) {
+                if let result = appState.longevityResult {
+                    LongevityDetailView(
+                        result: result,
+                        snapshot: appState.metricSnapshot,
+                        store: appState.store
+                    )
+                }
             }
             .sheet(item: $selectedMetric) { metric in
                 MetricDetailView(

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FocusMetricCard: View {
     let metricID: String?
+    var onTap: (() -> Void)? = nil
 
     private var definition: MetricDefinition? {
         guard let id = metricID else { return nil }
@@ -10,6 +11,7 @@ struct FocusMetricCard: View {
 
     var body: some View {
         if let def = definition {
+            Button { onTap?() } label: {
             HStack(spacing: VSpacing.m) {
                 // Accent left bar
                 RoundedRectangle(cornerRadius: VRadius.full)
@@ -37,6 +39,12 @@ struct FocusMetricCard: View {
                         .foregroundStyle(VColor.textSecondary)
                         .lineLimit(2)
                 }
+
+                if onTap != nil {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(VColor.accent.opacity(0.6))
+                }
             }
             .padding(VSpacing.l)
             .background(VColor.accentFaint)
@@ -45,6 +53,9 @@ struct FocusMetricCard: View {
                 RoundedRectangle(cornerRadius: VRadius.xl)
                     .strokeBorder(VColor.accent.opacity(0.25), lineWidth: 1)
             )
+            }
+            .buttonStyle(.plain)
+            .disabled(onTap == nil)
         }
     }
 }

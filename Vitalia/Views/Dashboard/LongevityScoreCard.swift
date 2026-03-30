@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LongevityScoreCard: View {
     let score: Double?
+    var onTap: (() -> Void)? = nil
 
     private var scoreColor: Color {
         guard let score else { return VColor.textTertiary }
@@ -19,52 +20,64 @@ struct LongevityScoreCard: View {
     }
 
     var body: some View {
-        HStack(spacing: VSpacing.l) {
-            // Score ring
-            ScoreRingView(
-                score: score ?? 0,
-                color: scoreColor,
-                size: 72,
-                lineWidth: 9,
-                sublabel: nil
-            )
+        Button {
+            onTap?()
+        } label: {
+            HStack(spacing: VSpacing.l) {
+                // Score ring
+                ScoreRingView(
+                    score: score ?? 0,
+                    color: scoreColor,
+                    size: 72,
+                    lineWidth: 9,
+                    sublabel: nil
+                )
 
-            VStack(alignment: .leading, spacing: VSpacing.xs) {
-                Label("Longevity Score", systemImage: "figure.run.circle.fill")
-                    .font(VFont.bodySmallFont)
-                    .foregroundStyle(VColor.textSecondary)
-                    .labelStyle(.titleAndIcon)
+                VStack(alignment: .leading, spacing: VSpacing.xs) {
+                    Label("Longevity Score", systemImage: "figure.run.circle.fill")
+                        .font(VFont.bodySmallFont)
+                        .foregroundStyle(VColor.textSecondary)
+                        .labelStyle(.titleAndIcon)
 
-                if let score {
-                    HStack(alignment: .firstTextBaseline, spacing: VSpacing.xs) {
-                        Text("\(Int(score.rounded()))")
-                            .font(.system(size: VFont.titleMedium, weight: .black, design: .rounded))
-                            .foregroundStyle(VColor.textPrimary)
-                            .contentTransition(.numericText())
+                    if let score {
+                        HStack(alignment: .firstTextBaseline, spacing: VSpacing.xs) {
+                            Text("\(Int(score.rounded()))")
+                                .font(.system(size: VFont.titleMedium, weight: .black, design: .rounded))
+                                .foregroundStyle(VColor.textPrimary)
+                                .contentTransition(.numericText())
 
-                        Text("/ 100")
-                            .font(VFont.bodySmallFont)
+                            Text("/ 100")
+                                .font(VFont.bodySmallFont)
+                                .foregroundStyle(VColor.textTertiary)
+                        }
+
+                        Text(scoreLabel)
+                            .font(.system(size: VFont.bodySmall, weight: .semibold))
+                            .foregroundStyle(scoreColor)
+                    } else {
+                        Text("Syncing…")
+                            .font(VFont.bodyMediumFont)
                             .foregroundStyle(VColor.textTertiary)
                     }
+                }
 
-                    Text(scoreLabel)
-                        .font(.system(size: VFont.bodySmall, weight: .semibold))
-                        .foregroundStyle(scoreColor)
-                } else {
-                    Text("Syncing…")
-                        .font(VFont.bodyMediumFont)
+                Spacer()
+
+                if onTap != nil {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(VColor.textTertiary)
                 }
             }
-
-            Spacer()
+            .padding(VSpacing.l)
+            .background(VColor.backgroundSecondary)
+            .clipShape(RoundedRectangle(cornerRadius: VRadius.xl))
+            .overlay(
+                RoundedRectangle(cornerRadius: VRadius.xl)
+                    .strokeBorder(scoreColor.opacity(0.2), lineWidth: 1)
+            )
         }
-        .padding(VSpacing.l)
-        .background(VColor.backgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: VRadius.xl))
-        .overlay(
-            RoundedRectangle(cornerRadius: VRadius.xl)
-                .strokeBorder(scoreColor.opacity(0.2), lineWidth: 1)
-        )
+        .buttonStyle(.plain)
+        .disabled(onTap == nil)
     }
 }

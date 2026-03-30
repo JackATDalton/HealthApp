@@ -1,8 +1,7 @@
 import Foundation
 
 /// Computes the aggregate Longevity Score (0–100) from per-metric scores.
-/// Formula: min(Tier1_scores) × 0.5 + evidence_weighted_average × 0.5
-/// A single bad Tier 1 metric caps the total.
+/// Formula: evidence-weighted average (Tier 1 = 3×, Tier 2 = 2×, Tier 3 = 1×)
 enum LongevityScoreCalculator {
 
     struct MetricScore: Identifiable {
@@ -17,7 +16,6 @@ enum LongevityScoreCalculator {
     struct Result {
         let score: Double
         let weightedAverage: Double
-        let minTier1Score: Double
         let metricScores: [MetricScore]
     }
 
@@ -90,7 +88,7 @@ enum LongevityScoreCalculator {
         }
 
         guard !scores.isEmpty else {
-            return Result(score: 0, weightedAverage: 0, minTier1Score: 100, metricScores: [])
+            return Result(score: 0, weightedAverage: 0, metricScores: [])
         }
 
         // Evidence-weighted average: Tier 1 = weight 3, Tier 2 = 2, Tier 3 = 1
@@ -102,18 +100,11 @@ enum LongevityScoreCalculator {
             totalWeight += w
         }
         let weightedAverage = totalWeight > 0 ? weightedSum / totalWeight : 0
-
-        // Tier 1 outlier penalty
-        let tier1Scores = scores.filter { $0.tier == .tier1 }.map(\.score)
-        let minTier1 = tier1Scores.isEmpty ? 100.0 : tier1Scores.min()!
-
-        // spec formula: min(Tier1) × 0.5 + weighted_average × 0.5
-        let finalScore = (minTier1 * 0.5 + weightedAverage * 0.5).rounded()
+        let finalScore = weightedAverage.rounded()
 
         return Result(
             score: max(0, min(100, finalScore)),
             weightedAverage: weightedAverage,
-            minTier1Score: minTier1,
             metricScores: scores.sorted { $0.score < $1.score }   // worst first
         )
     }

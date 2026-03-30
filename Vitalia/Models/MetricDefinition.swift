@@ -160,10 +160,10 @@ struct MetricDefinition: Identifiable {
 
         .init(id: "vigorous_minutes", displayName: "Vigorous / Week", unit: "min/wk",
               category: .activity, evidenceTier: .tier1,
-              optimalLow: 20, optimalHigh: 30,
+              optimalLow: 75, optimalHigh: nil,
               higherIsBetter: true,
-              description: "Minutes above 80% max HR per week.",
-              longevityContext: "High-intensity intervals extend the VO₂ Max ceiling and improve insulin sensitivity beyond what Zone 2 alone achieves."),
+              description: "Weekly minutes at vigorous intensity — effort hard enough that you can only say a few words without pausing for breath. Tracked as >80% max HR, which sits within the ACSM vigorous range of 77–93% max HR.",
+              longevityContext: "WHO and NHS guidelines define vigorous activity as effort that makes you breathe hard and fast enough that speaking more than a few words requires pausing — equivalent to roughly 77–93% max HR (ACSM). Both recommend 75 min/week of vigorous activity as the minimum threshold equivalent to 150 min/week of moderate activity. Gebel et al. (2015, JAMA Internal Medicine) found that substituting vigorous for moderate activity reduced all-cause mortality independently of total exercise volume, even after adjusting for total MET-hours. High-intensity work above the lactate threshold is also the primary driver of VO₂ Max ceiling extension beyond what Zone 2 alone achieves (Helgerud et al., 2007, Medicine & Science in Sports & Exercise). The app uses >80% max HR as a conservative proxy — this captures the upper portion of the vigorous range where the VO₂ Max adaptation is strongest."),
 
         .init(id: "strength_sessions", displayName: "Strength Sessions", unit: "sessions/wk",
               category: .activity, evidenceTier: .tier1,
@@ -179,12 +179,6 @@ struct MetricDefinition: Identifiable {
               description: "Aggregate training stress from the last 7 days (HR × duration).",
               longevityContext: "Helps identify load/recovery imbalances. Contextualises recovery score — sustained high load with low recovery signals overtraining."),
 
-        .init(id: "stand_hours", displayName: "Stand Hours", unit: "hrs/day",
-              category: .activity, evidenceTier: .tier2,
-              optimalLow: 12, optimalHigh: nil,
-              higherIsBetter: true,
-              description: "Average daily hours in which you stood for at least 1 minute (Apple Watch Stand ring). 30-day average.",
-              longevityContext: "Prolonged sitting is an independent risk factor even in otherwise active individuals. Breaking sedentary time every hour improves postprandial glucose, endothelial function, and NEAT. 12+ stand hours/day = full ring completion."),
 
         // MARK: - Body Composition
         .init(id: "body_weight_trend", displayName: "Weight Stability", unit: "% change",

@@ -29,7 +29,6 @@ final class HealthKitPermissionsManager {
             HKQuantityType(.stepCount),
             HKQuantityType(.activeEnergyBurned),
             HKQuantityType(.basalEnergyBurned),
-            HKCategoryType(.appleStandHour),
             // Body composition
             HKQuantityType(.bodyMass),
             HKQuantityType(.bodyMassIndex),
