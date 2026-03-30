@@ -1,6 +1,6 @@
 import HealthKit
 
-/// Reads the 7-day passive progress signals sent to Claude in the longevity plan prompt.
+/// Reads 30-day passive progress signals sent to Claude in the longevity plan prompt.
 @MainActor
 final class HealthKitPassiveReader {
     private let store: HKHealthStore
@@ -10,13 +10,13 @@ final class HealthKitPassiveReader {
     }
 
     struct PassiveContext {
-        var avgSleepHours7Day:    Double?
-        var avgSleepEfficiency7Day: Double?
-        var zone2MinutesWeek:     Double?
-        var vigorousMinutesWeek:  Double?
-        var strengthSessionsWeek: Int?
-        var avgDailySteps7Day:    Double?
-        var avgActiveEnergy7Day:  Double?
+        var avgSleepHours30Day:    Double?
+        var avgSleepEfficiency30Day: Double?
+        var zone2MinutesWeek:      Double?
+        var vigorousMinutesWeek:   Double?
+        var strengthSessionsWeek:  Double?
+        var avgDailySteps30Day:    Double?
+        var avgActiveEnergy30Day:  Double?
     }
 
     func read(userAge: Int) async -> PassiveContext {
@@ -25,13 +25,13 @@ final class HealthKitPassiveReader {
 
         async let sleepResult   = sleepAnalyser.fetchSleepResult()
         async let workoutResult = workoutAnalyser.fetchWorkoutResult(userAge: userAge)
-        async let steps7Day     = fetchWeeklyDailyAverage(.stepCount, unit: .count())
-        async let energy7Day    = fetchWeeklyDailyAverage(.activeEnergyBurned, unit: .kilocalorie())
+        async let steps30Day    = fetchDailyAverage(.stepCount,          unit: .count(),       daysBack: 30)
+        async let energy30Day   = fetchDailyAverage(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 30)
 
         let sleep   = await sleepResult
         let workout = await workoutResult
-        let steps   = await steps7Day
-        let energy  = await energy7Day
+        let steps   = await steps30Day
+        let energy  = await energy30Day
 
         let avgSleepHrs = sleep.recent7Days.isEmpty ? nil :
             sleep.recent7Days.reduce(0.0) { $0 + $1.durationHours } / Double(sleep.recent7Days.count)
@@ -39,19 +39,19 @@ final class HealthKitPassiveReader {
             sleep.recent7Days.reduce(0.0) { $0 + $1.efficiency } / Double(sleep.recent7Days.count) * 100
 
         return PassiveContext(
-            avgSleepHours7Day:      avgSleepHrs,
-            avgSleepEfficiency7Day: avgEff,
-            zone2MinutesWeek:       workout.zone2MinutesWeekly,
-            vigorousMinutesWeek:    workout.vigorousMinutesWeekly,
-            strengthSessionsWeek:   workout.strengthSessionsWeekly,
-            avgDailySteps7Day:      steps,
-            avgActiveEnergy7Day:    energy
+            avgSleepHours30Day:      avgSleepHrs,
+            avgSleepEfficiency30Day: avgEff,
+            zone2MinutesWeek:        workout.zone2MinutesWeekly,
+            vigorousMinutesWeek:     workout.vigorousMinutesWeekly,
+            strengthSessionsWeek:    workout.strengthSessionsWeekly,
+            avgDailySteps30Day:      steps,
+            avgActiveEnergy30Day:    energy
         )
     }
 
-    private func fetchWeeklyDailyAverage(_ id: HKQuantityTypeIdentifier, unit: HKUnit) async -> Double? {
+    private func fetchDailyAverage(_ id: HKQuantityTypeIdentifier, unit: HKUnit, daysBack: Int) async -> Double? {
         await withCheckedContinuation { continuation in
-            let startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+            let startDate = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
             let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
 
             let query = HKStatisticsQuery(
@@ -63,7 +63,7 @@ final class HealthKitPassiveReader {
                     continuation.resume(returning: nil)
                     return
                 }
-                continuation.resume(returning: total / 7.0)
+                continuation.resume(returning: total / Double(daysBack))
             }
             store.execute(query)
         }

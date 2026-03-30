@@ -25,19 +25,19 @@ final class HealthKitMetricsCollector {
         async let rrBaseline  = fetchDailyAverage(.respiratoryRate,          unit: heartRateUnit,    daysBack: 30)
         async let vo2max      = fetchMax(.vo2Max,              unit: .init(from: "ml/kg*min"),       daysBack: 30)
         async let spo2        = fetchOvernightMin(.oxygenSaturation, unit: .percent())
-        async let walkingHR   = fetchDailyAverage(.walkingHeartRateAverage, unit: heartRateUnit, daysBack: 7)
+        async let walkingHR   = fetchDailyAverage(.walkingHeartRateAverage, unit: heartRateUnit, daysBack: 30)
         async let cardioRecov = fetchLatestSample(.heartRateRecoveryOneMinute, unit: heartRateUnit)
-        async let steps       = fetchDailySum(.stepCount, unit: .count(), daysBack: 1)
-        async let activeEnergy = fetchDailySum(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 1)
+        async let steps       = fetchDailyAverageSum(.stepCount,        unit: .count(),     daysBack: 30)
+        async let activeEnergy = fetchDailyAverageSum(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 30)
         async let respRate    = fetchOvernightAverage(.respiratoryRate, unit: heartRateUnit)
-        async let standTime   = fetchDailySum(.appleStandTime, unit: .minute(), daysBack: 1)
-        async let bodyMass    = fetchLatestSample(.bodyMass, unit: .gramUnit(with: .kilo))
-        async let bmi         = fetchLatestSample(.bodyMassIndex, unit: .count())
+        async let standTime   = fetchDailyAverageSum(.appleStandTime,   unit: .minute(),    daysBack: 30)
+        async let bodyMass    = fetchLatestSample(.bodyMass,          unit: .gramUnit(with: .kilo))
+        async let heightM     = fetchLatestSample(.height,            unit: .meter())
         async let bodyFat     = fetchLatestSample(.bodyFatPercentage, unit: .percent())
-        async let bpSystolic  = fetchLatestSample(.bloodPressureSystolic, unit: .millimeterOfMercury())
+        async let bpSystolic  = fetchLatestSample(.bloodPressureSystolic,  unit: .millimeterOfMercury())
         async let bpDiastolic = fetchLatestSample(.bloodPressureDiastolic, unit: .millimeterOfMercury())
-        async let daylightSec = fetchDailySum(.timeInDaylight, unit: .second(), daysBack: 1)
-        async let mindfulSec  = fetchMindfulMinutes(daysBack: 1)
+        async let daylightSec = fetchDailyAverageSum(.timeInDaylight,  unit: .second(),    daysBack: 30)
+        async let mindfulSec  = fetchMindfulAverageMinutes(daysBack: 30)
         async let wristTemp   = fetchWristTemperatureDeviation()
         async let sleep       = sleepAnalyser.fetchSleepResult()
         async let workouts    = workoutAnalyser.fetchWorkoutResult(userAge: userAge)
@@ -48,71 +48,73 @@ final class HealthKitMetricsCollector {
         let hrvBaselineVal = await hrvBaseline
         let rhrBaselineVal = await rhrBaseline
         let rrBaselineVal  = await rrBaseline
-        let vo2Val      = await vo2max
-        let spo2Val     = await spo2
-        let walkHRVal   = await walkingHR
-        let recovVal    = await cardioRecov
-        let stepsVal    = await steps
-        let energyVal   = await activeEnergy
-        let rrVal       = await respRate
-        let standVal    = await standTime
-        let massVal     = await bodyMass
-        let bmiVal      = await bmi
-        let fatVal      = await bodyFat
-        let bpSysVal    = await bpSystolic
-        let bpDiaVal    = await bpDiastolic
-        let daylightVal = await daylightSec
-        let mindfulVal  = await mindfulSec
-        let wristVal    = await wristTemp
-        let sleepResult = await sleep
-        let workResult  = await workouts
+        let vo2Val         = await vo2max
+        let spo2Val        = await spo2
+        let walkHRVal      = await walkingHR
+        let recovVal       = await cardioRecov
+        let stepsVal       = await steps
+        let energyVal      = await activeEnergy
+        let rrVal          = await respRate
+        let standVal       = await standTime
+        let massVal        = await bodyMass
+        let heightVal      = await heightM
+        let fatVal         = await bodyFat
+        let bpSysVal       = await bpSystolic
+        let bpDiaVal       = await bpDiastolic
+        let daylightVal    = await daylightSec
+        let mindfulVal     = await mindfulSec
+        let wristVal       = await wristTemp
+        let sleepResult    = await sleep
+        let workResult     = await workouts
 
         var snapshot: [String: Double] = [:]
 
         // Cardiovascular
-        if let v = hrvVal         { snapshot["hrv"]             = v }
-        if let v = rhrVal         { snapshot["rhr"]             = v }
-        if let v = hrvBaselineVal { snapshot["hrv_baseline"]    = v }
-        if let v = rhrBaselineVal { snapshot["rhr_baseline"]    = v }
-        if let v = rrBaselineVal  { snapshot["rr_baseline"]     = v }
-        if let v = vo2Val     { snapshot["vo2max"]          = v }   // raw; correction applied in evaluator
-        if let v = spo2Val    { snapshot["spo2"]            = v * 100 }   // 0‥1 → percentage
-        if let v = walkHRVal  { snapshot["walking_hr"]      = v }
-        if let v = recovVal   { snapshot["cardio_recovery"] = v }
-        if let v = bpSysVal   { snapshot["bloodpressure_sys"] = v }
-        if let v = bpDiaVal   { snapshot["bloodpressure_dia"] = v }
+        if let v = hrvVal         { snapshot["hrv"]               = v }
+        if let v = rhrVal         { snapshot["rhr"]               = v }
+        if let v = hrvBaselineVal { snapshot["hrv_baseline"]      = v }
+        if let v = rhrBaselineVal { snapshot["rhr_baseline"]      = v }
+        if let v = rrBaselineVal  { snapshot["rr_baseline"]       = v }
+        if let v = vo2Val         { snapshot["vo2max"]            = v }
+        if let v = spo2Val        { snapshot["spo2"]              = v * 100 }   // 0‥1 → percentage
+        if let v = walkHRVal      { snapshot["walking_hr"]        = v }
+        if let v = recovVal       { snapshot["cardio_recovery"]   = v }
+        if let v = bpSysVal       { snapshot["bloodpressure_sys"] = v }
+        if let v = bpDiaVal       { snapshot["bloodpressure_dia"] = v }
 
-        // Activity
-        if let v = stepsVal   { snapshot["steps"]           = v }
-        if let v = energyVal  { snapshot["active_energy"]   = v }
-        if let v = standVal   { snapshot["stand_hours"]     = v / 60 }    // minutes → hours
-        snapshot["zone2_minutes"]    = workResult.zone2MinutesWeekly
-        snapshot["vigorous_minutes"] = workResult.vigorousMinutesWeekly
-        snapshot["strength_sessions"] = Double(workResult.strengthSessionsWeekly)
-        snapshot["training_load"]    = workResult.trainingLoad7Day
+        // Activity — all 30-day daily averages
+        if let v = stepsVal       { snapshot["steps"]             = v }
+        if let v = energyVal      { snapshot["active_energy"]     = v }
+        if let v = standVal       { snapshot["stand_hours"]       = v / 60 }    // avg daily minutes → hours
+        snapshot["zone2_minutes"]     = workResult.zone2MinutesWeekly
+        snapshot["vigorous_minutes"]  = workResult.vigorousMinutesWeekly
+        snapshot["strength_sessions"] = workResult.strengthSessionsWeekly
+        snapshot["training_load"]     = workResult.trainingLoadWeekly
 
-        // Body composition
-        if let v = massVal    { snapshot["body_weight_trend"] = v }
-        if let v = bmiVal     { snapshot["bmi"]              = v }
-        if let v = fatVal     { snapshot["body_fat"]         = v * 100 }  // 0‥1 → percentage
+        // Body composition — BMI computed from latest height + mass; falls back to nil if unavailable
+        if let v = massVal { snapshot["body_weight_trend"] = v }
+        if let mass = massVal, let height = heightVal, height > 0 {
+            snapshot["bmi"] = mass / (height * height)
+        }
+        if let v = fatVal { snapshot["body_fat"] = v * 100 }                   // 0‥1 → percentage
 
         // Sleep
         if let night = sleepResult.lastNight {
             snapshot["sleep_duration"]   = night.durationHours
             snapshot["sleep_efficiency"] = night.efficiency * 100
-            snapshot["deep_sleep_pct"]   = night.deepPct * 100
-            snapshot["rem_sleep_pct"]    = night.remPct  * 100
+            snapshot["deep_sleep_pct"]   = night.deepPct  * 100
+            snapshot["rem_sleep_pct"]    = night.remPct   * 100
             snapshot["awake_pct"]        = night.awakePct * 100
         }
         snapshot["sleep_debt"] = sleepResult.rollingDebtMinutes
 
         // Sleep / Stress
-        if let v = rrVal      { snapshot["respiratory_rate"] = v }
-        if let v = wristVal   { snapshot["wrist_temp"]       = v }
+        if let v = rrVal      { snapshot["respiratory_rate"]  = v }
+        if let v = wristVal   { snapshot["wrist_temp"]         = v }
 
-        // Stress & Recovery
-        if let v = mindfulVal { snapshot["mindful_minutes"]  = v }
-        if let v = daylightVal { snapshot["daylight_exposure"] = v / 60 }  // seconds → minutes
+        // Stress & Recovery — 30-day daily averages
+        if let v = mindfulVal  { snapshot["mindful_minutes"]   = v }
+        if let v = daylightVal { snapshot["daylight_exposure"] = v / 60 }      // avg daily seconds → minutes
 
         return snapshot
     }
@@ -173,7 +175,7 @@ final class HealthKitMetricsCollector {
         }
     }
 
-    /// Cumulative sum for today (steps, energy, etc.).
+    /// Total cumulative sum over the last N days.
     private func fetchDailySum(_ id: HKQuantityTypeIdentifier, unit: HKUnit, daysBack: Int) async -> Double? {
         await withCheckedContinuation { continuation in
             let start = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
@@ -189,6 +191,13 @@ final class HealthKitMetricsCollector {
             }
             store.execute(query)
         }
+    }
+
+    /// Average daily sum over the last N days (total ÷ N).
+    /// Use for step count, stand time, daylight, etc.
+    private func fetchDailyAverageSum(_ id: HKQuantityTypeIdentifier, unit: HKUnit, daysBack: Int) async -> Double? {
+        guard let total = await fetchDailySum(id, unit: unit, daysBack: daysBack) else { return nil }
+        return total / Double(daysBack)
     }
 
     /// Minimum SpO₂ or similar during overnight window (21:00–09:00).
@@ -227,8 +236,8 @@ final class HealthKitMetricsCollector {
         }
     }
 
-    /// Total mindful session duration today, in minutes.
-    private func fetchMindfulMinutes(daysBack: Int) async -> Double? {
+    /// Average daily mindful session minutes over the last N days.
+    private func fetchMindfulAverageMinutes(daysBack: Int) async -> Double? {
         await withCheckedContinuation { continuation in
             let start = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
             let predicate = HKQuery.predicateForSamples(withStart: start, end: Date())
@@ -247,7 +256,7 @@ final class HealthKitMetricsCollector {
                 let totalSeconds = sessions.reduce(0.0) {
                     $0 + $1.endDate.timeIntervalSince($1.startDate)
                 }
-                continuation.resume(returning: totalSeconds / 60)
+                continuation.resume(returning: (totalSeconds / 60) / Double(daysBack))
             }
             store.execute(query)
         }
@@ -255,7 +264,6 @@ final class HealthKitMetricsCollector {
 
     /// Wrist temperature deviation from 30-day baseline (Series 8+ only).
     private func fetchWristTemperatureDeviation() async -> Double? {
-
         let (recentStart, recentEnd) = overnightWindow()
 
         async let todayTemp    = fetchOvernightAvg_wristTemp(from: recentStart, to: recentEnd)

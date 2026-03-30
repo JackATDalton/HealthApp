@@ -46,10 +46,10 @@ struct MetricDefinition: Identifiable {
 
         .init(id: "rhr", displayName: "Resting Heart Rate", unit: "bpm",
               category: .cardiovascular, evidenceTier: .tier1,
-              optimalLow: 40, optimalHigh: 55,
+              optimalLow: 40, optimalHigh: 45,
               higherIsBetter: false,
               description: "Heart rate at complete rest.",
-              longevityContext: "Every 10 bpm increase in RHR above 45 associates with ~16% increased cardiovascular mortality."),
+              longevityContext: "Every 10 bpm increase in RHR above 45 associates with ~16% increased cardiovascular mortality. Optimal range is 40–45 bpm."),
 
         .init(id: "hrv", displayName: "Heart Rate Variability", unit: "ms",
               category: .cardiovascular, evidenceTier: .tier1,
@@ -146,10 +146,10 @@ struct MetricDefinition: Identifiable {
         // MARK: - Activity
         .init(id: "steps", displayName: "Daily Steps", unit: "steps",
               category: .activity, evidenceTier: .tier1,
-              optimalLow: 10_000, optimalHigh: 12_000,
+              optimalLow: 10_000, optimalHigh: nil,
               higherIsBetter: true,
-              description: "Total steps per day.",
-              longevityContext: "10k steps/day associates with ~50% lower all-cause mortality vs 4k (Paluch et al., Lancet 2022). Diminishing returns above ~12k."),
+              description: "Average daily steps over the last 30 days.",
+              longevityContext: "10k steps/day associates with ~50% lower all-cause mortality vs 4k (Paluch et al., Lancet 2022). More is better — no upper penalty."),
 
         .init(id: "zone2_minutes", displayName: "Zone 2 / Week", unit: "min/wk",
               category: .activity, evidenceTier: .tier1,
@@ -172,7 +172,7 @@ struct MetricDefinition: Identifiable {
               description: "Resistance training sessions per week.",
               longevityContext: "Muscle mass and strength are independent predictors of all-cause mortality. 3+ sessions/week significantly reduces risk of falls and metabolic disease."),
 
-        .init(id: "training_load", displayName: "7-Day Training Load", unit: "AU",
+        .init(id: "training_load", displayName: "Training Load", unit: "AU/wk",
               category: .activity, evidenceTier: .tier2,
               optimalLow: nil, optimalHigh: nil,
               higherIsBetter: true,

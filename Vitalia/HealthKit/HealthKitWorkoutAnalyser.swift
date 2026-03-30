@@ -1,7 +1,7 @@
 import HealthKit
 
-/// Derives Zone 2 minutes, vigorous minutes, strength sessions, and 7-day training load
-/// from Apple Watch workout data and associated heart rate samples.
+/// Derives Zone 2 minutes, vigorous minutes, strength sessions, and training load
+/// from the last 30 days of Apple Watch workout data, expressed as weekly averages.
 @MainActor
 final class HealthKitWorkoutAnalyser {
     private let store: HKHealthStore
@@ -11,46 +11,41 @@ final class HealthKitWorkoutAnalyser {
     }
 
     struct WorkoutResult {
-        let zone2MinutesWeekly:    Double
+        let zone2MinutesWeekly:    Double   // 30-day total ÷ 4.286 weeks
         let vigorousMinutesWeekly: Double
-        let strengthSessionsWeekly: Int
-        let trainingLoad7Day:      Double      // arbitrary units: sum(avgHRPct * durationMin)
+        let strengthSessionsWeekly: Double  // Double so fractional weeks average correctly
+        let trainingLoadWeekly:    Double   // arbitrary units per week
     }
 
     // MARK: - Fetch
 
     func fetchWorkoutResult(userAge: Int) async -> WorkoutResult {
-        let workouts = await fetchWorkouts(daysBack: 7)
+        let workouts = await fetchWorkouts(daysBack: 30)
 
-        let maxHR = Double(220 - userAge)
-        let zone2Low  = maxHR * 0.60
-        let zone2High = maxHR * 0.70
+        let maxHR             = Double(220 - userAge)
+        let zone2Low          = maxHR * 0.60
+        let zone2High         = maxHR * 0.70
         let vigorousThreshold = maxHR * 0.80
 
-        var zone2Mins:    Double = 0
-        var vigorousMins: Double = 0
-        var strengthCount = 0
-        var trainingLoad:  Double = 0
+        var zone2Secs:    Double = 0
+        var vigorousSecs: Double = 0
+        var strengthCount        = 0
+        var trainingLoad: Double = 0
 
         for workout in workouts {
             if isStrengthWorkout(workout) {
                 strengthCount += 1
-                // Still count HR-based load for strength if HR data available
             }
 
-            // Fetch HR samples scoped to this workout
             let hrSamples = await fetchHRSamples(for: workout)
 
             if hrSamples.isEmpty {
-                // Fall back: classify workout by type only
                 if !isStrengthWorkout(workout) {
-                    // Assume zone 2 for unknown cardio
-                    zone2Mins += workout.duration / 60
+                    zone2Secs += workout.duration
                 }
                 continue
             }
 
-            // Calculate time in each zone from 5-second-ish HR samples
             var z2Secs:  Double = 0
             var vigSecs: Double = 0
             var sumHR:   Double = 0
@@ -61,7 +56,6 @@ final class HealthKitWorkoutAnalyser {
                 sumHR += hr
                 count += 1
 
-                // Duration represented by this sample = gap to next sample (or 5s default)
                 let nextDate: Date
                 if index + 1 < hrSamples.count {
                     nextDate = hrSamples[index + 1].startDate
@@ -78,21 +72,22 @@ final class HealthKitWorkoutAnalyser {
                 }
             }
 
-            zone2Mins    += z2Secs  / 60
-            vigorousMins += vigSecs / 60
+            zone2Secs    += z2Secs
+            vigorousSecs += vigSecs
 
-            // Training load: avgHRPct × durationMin
             if count > 0 {
                 let avgHRPct = (sumHR / Double(count)) / maxHR
                 trainingLoad += avgHRPct * (workout.duration / 60)
             }
         }
 
+        // Convert 30-day totals to weekly averages (30 days ÷ 7 days/week = 4.286 weeks)
+        let weeks = 30.0 / 7.0
         return WorkoutResult(
-            zone2MinutesWeekly:     zone2Mins,
-            vigorousMinutesWeekly:  vigorousMins,
-            strengthSessionsWeekly: strengthCount,
-            trainingLoad7Day:       trainingLoad
+            zone2MinutesWeekly:     (zone2Secs    / 60) / weeks,
+            vigorousMinutesWeekly:  (vigorousSecs / 60) / weeks,
+            strengthSessionsWeekly: Double(strengthCount) / weeks,
+            trainingLoadWeekly:     trainingLoad / weeks
         )
     }
 
@@ -140,6 +135,7 @@ final class HealthKitWorkoutAnalyser {
         switch workout.workoutActivityType {
         case .traditionalStrengthTraining,
              .functionalStrengthTraining,
+             .highIntensityIntervalTraining,
              .coreTraining,
              .crossTraining,
              .wrestling,

@@ -82,7 +82,7 @@
 		05AB62044B43B5276BC384F7 /* RecoveryScoreResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScoreResult.swift; sourceTree = "<group>"; };
 		05ABE07F384CCF899D60A112 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0889B56ECC42DD8D6C598280 /* OnboardingFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowUITests.swift; sourceTree = "<group>"; };
-		0E44D255E686EB736E0D76D8 /* VitaliaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; name = VitaliaUITests.xctest; path = Vitalia.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E44D255E686EB736E0D76D8 /* VitaliaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VitaliaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1AF0A496E7488ECDF5232708 /* MetricCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricCardView.swift; sourceTree = "<group>"; };
 		21ADFDD3CE6401A3C86724F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		238DD9378576E4F09DF5D98D /* StatRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatRowView.swift; sourceTree = "<group>"; };
@@ -90,10 +90,10 @@
 		25672A308D1AFC00993321A6 /* TierBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierBadgeView.swift; sourceTree = "<group>"; };
 		2AB9A1BA6E6B82216CD6A2CE /* FocusMetricCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMetricCard.swift; sourceTree = "<group>"; };
 		3111AA65BA0ABBE5F5F6B2F1 /* ClaudeAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeAPIClient.swift; sourceTree = "<group>"; };
-		321D2BB0353841038B8AC14B /* Vitalia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vitalia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		321D2BB0353841038B8AC14B /* Vitalia.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Vitalia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A0D7CE4E96B25B588C12A9 /* TrendAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendAnalyser.swift; sourceTree = "<group>"; };
 		3D388648662722A1C0FEBE01 /* LongevityPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongevityPlan.swift; sourceTree = "<group>"; };
-		3D93D2CB24AB6019A10A3416 /* VitaliaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; name = VitaliaTests.xctest; path = Vitalia.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D93D2CB24AB6019A10A3416 /* VitaliaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VitaliaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DA74564A23EEA00DFD80EFA /* SwiftDataContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataContainer.swift; sourceTree = "<group>"; };
 		46D3553AADEF65E8DE112B81 /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
 		4D90051E3915F475FA947EA4 /* MetricEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricEvaluator.swift; sourceTree = "<group>"; };
@@ -431,6 +431,7 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					04A74775E55C7A69BECF52B1 = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					1E776FABE1B792D17D4721DE = {
@@ -691,7 +692,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Vitalia/Vitalia.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = VARUH939ZA;
 				INFOPLIST_FILE = Vitalia/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -791,7 +791,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Vitalia/Vitalia.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = VARUH939ZA;
 				INFOPLIST_FILE = Vitalia/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
