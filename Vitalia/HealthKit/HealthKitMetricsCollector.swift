@@ -22,7 +22,7 @@ final class HealthKitMetricsCollector {
         async let rhr         = fetchDailyAverage(.restingHeartRate,         unit: heartRateUnit,    daysBack: 2)
         async let vo2max      = fetchMax(.vo2Max,              unit: .init(from: "ml/kg*min"),       daysBack: 30)
         async let spo2        = fetchOvernightMin(.oxygenSaturation, unit: .percent())
-        async let walkingHR   = fetchDailyAverage(.appleWalkingHeartRateAverage, unit: heartRateUnit, daysBack: 7)
+        async let walkingHR   = fetchDailyAverage(.walkingHeartRateAverage, unit: heartRateUnit, daysBack: 7)
         async let cardioRecov = fetchLatestSample(.heartRateRecoveryOneMinute, unit: heartRateUnit)
         async let steps       = fetchDailySum(.stepCount, unit: .count(), daysBack: 1)
         async let activeEnergy = fetchDailySum(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 1)
@@ -246,9 +246,6 @@ final class HealthKitMetricsCollector {
 
     /// Wrist temperature deviation from 30-day baseline (Series 8+ only).
     private func fetchWristTemperatureDeviation() async -> Double? {
-        guard HKQuantityType.isIdentifierValid(
-            HKQuantityTypeIdentifier.appleSleepingWristTemperature.rawValue
-        ) else { return nil }
 
         let (recentStart, recentEnd) = overnightWindow()
 

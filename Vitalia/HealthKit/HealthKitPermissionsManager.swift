@@ -19,7 +19,7 @@ final class HealthKitPermissionsManager {
             HKQuantityType(.heartRate),
             HKQuantityType(.oxygenSaturation),
             HKQuantityType(.respiratoryRate),
-            HKQuantityType(.appleWalkingHeartRateAverage),
+            HKQuantityType(.walkingHeartRateAverage),
             HKQuantityType(.vo2Max),
             HKQuantityType(.heartRateRecoveryOneMinute),
             // Blood pressure
@@ -47,12 +47,9 @@ final class HealthKitPermissionsManager {
             HKCharacteristicType(.biologicalSex),
             HKCharacteristicType(.bloodType),
         ]
-        // Wrist temperature: Series 8+ only
-        if HKQuantityType.isIdentifierValid(
-            HKQuantityTypeIdentifier.appleSleepingWristTemperature.rawValue
-        ) {
-            types.insert(HKQuantityType(.appleSleepingWristTemperature))
-        }
+        // Wrist temperature: Series 8+ only — include unconditionally since app requires iOS 17;
+        // HealthKit returns no data on unsupported hardware without crashing.
+        types.insert(HKQuantityType(.appleSleepingWristTemperature))
         return types
     }
 
