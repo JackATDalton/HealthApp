@@ -63,13 +63,14 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $showRecoveryDetail) {
-                RecoveryDetailView(result: appState.recoveryResult)
+                RecoveryDetailView(result: appState.recoveryResult, snapshot: appState.metricSnapshot)
             }
             .sheet(item: $selectedMetric) { metric in
                 MetricDetailView(
                     metric: metric,
                     snapshot: appState.metricSnapshot,
-                    evalResult: appState.metricEvalResults[metric.id]
+                    evalResult: appState.metricEvalResults[metric.id],
+                    store: appState.store
                 )
             }
         }

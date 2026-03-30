@@ -21,6 +21,9 @@ enum LongevityScoreCalculator {
         let metricScores: [MetricScore]
     }
 
+    /// Metrics excluded from Longevity Score (shown in dashboard but not factored into score).
+    private static let excludedFromScore: Set<String> = ["body_weight_trend"]
+
     static func calculate(
         snapshot: [String: Double],
         configs: [MetricConfig]
@@ -32,14 +35,40 @@ enum LongevityScoreCalculator {
         var scores: [MetricScore] = []
 
         for def in MetricDefinition.all {
+            // Skip if explicitly excluded from longevity score
+            if excludedFromScore.contains(def.id) { continue }
             // Skip if explicitly disabled
             let config = enabledConfigs[def.id]
             if config?.isEnabled == false { continue }
 
+            // HRV: compare 30-day average to all-time average to detect long-term decline/improvement.
+            // Recovery score continues to use overnight vs 30-day baseline (unchanged).
+            if def.id == "hrv" {
+                guard let current  = snapshot["hrv_baseline"],
+                      let longterm = snapshot["hrv_longterm_baseline"],
+                      longterm > 0
+                else { continue }
+
+                let evalResult = MetricEvaluator.evaluate(
+                    current,
+                    definition: def,
+                    customLow:  longterm,
+                    customHigh: nil
+                )
+                scores.append(MetricScore(
+                    id:          def.id,
+                    displayName: def.displayName,
+                    tier:        def.evidenceTier,
+                    score:       evalResult.score,
+                    rawValue:    current,
+                    status:      evalResult.status
+                ))
+                continue
+            }
+
             guard let value = snapshot[def.id] else { continue }
 
-            // Don't score metrics without any bounds via this path
-            // (HRV is scored in RecoveryScore; training_load is contextual)
+            // Don't score metrics without any bounds via this path (training_load is contextual)
             let hasAnyBound = def.optimalLow != nil || def.optimalHigh != nil
             guard hasAnyBound else { continue }
 

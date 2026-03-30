@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Observation
+import HealthKit
 
 @Observable
 @MainActor
@@ -32,6 +33,7 @@ final class AppState {
 
     // MARK: - Shared HealthKit store
     private let hkPermissions = HealthKitPermissionsManager()
+    var store: HKHealthStore { hkPermissions.store }
 
     // MARK: - Sync
 

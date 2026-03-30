@@ -26,7 +26,7 @@ struct RecoveryInputBreakdown: Codable {
     var wristTempScore: Double?
     var activeWeights: [String: Double]
 
-    var sortedInputs: [(name: String, score: Double?, weight: Double)] {
+    var sortedInputs: [(name: String, score: Double?, weight: Double, key: String)] {
         let pairs: [(String, Double?, String)] = [
             ("HRV",           hrvScore,            "hrv"),
             ("Resting HR",    rhrScore,             "rhr"),
@@ -36,7 +36,7 @@ struct RecoveryInputBreakdown: Codable {
             ("SpO₂",          spo2Score,            "spo2"),
             ("Wrist Temp",    wristTempScore,       "wristTemp"),
         ]
-        return pairs.map { (name: $0.0, score: $0.1, weight: activeWeights[$0.2] ?? 0) }
+        return pairs.map { (name: $0.0, score: $0.1, weight: activeWeights[$0.2] ?? 0, key: $0.2) }
             .filter { $0.weight > 0 }
             .sorted { ($0.weight) > ($1.weight) }
     }

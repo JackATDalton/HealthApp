@@ -4,11 +4,19 @@ import SwiftData
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
     @Query private var profiles: [UserProfile]
+    @Query private var metricConfigs: [MetricConfig]
     @AppStorage("preferredModel") private var selectedModel = "claude-sonnet-4-6"
     @State private var showAPIKeyEntry = false
     @State private var usesMetric = true
 
     private let models = ["claude-sonnet-4-6", "claude-opus-4-6"]
+
+    private var enabledCount: String {
+        let total    = MetricDefinition.all.count
+        let disabled = metricConfigs.filter { !$0.isEnabled }.count
+        let enabled  = total - disabled
+        return "\(enabled) of \(total)"
+    }
 
     var body: some View {
         NavigationStack {
@@ -32,6 +40,18 @@ struct SettingsView: View {
                     modelPickerRow
                 } header: {
                     sectionHeader("Claude API")
+                }
+                .listRowBackground(VColor.backgroundSecondary)
+
+                // Metrics
+                Section {
+                    NavigationLink {
+                        MetricsSettingsView()
+                    } label: {
+                        label("Tracked Metrics", systemImage: "chart.bar.fill", value: enabledCount)
+                    }
+                } header: {
+                    sectionHeader("Metrics")
                 }
                 .listRowBackground(VColor.backgroundSecondary)
 

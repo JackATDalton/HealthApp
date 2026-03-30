@@ -187,12 +187,12 @@ struct MetricDefinition: Identifiable {
               longevityContext: "Prolonged sitting is an independent risk factor even in otherwise active individuals. Breaking sedentary time every hour improves postprandial glucose, endothelial function, and NEAT. 12+ stand hours/day = full ring completion."),
 
         // MARK: - Body Composition
-        .init(id: "body_weight_trend", displayName: "Weight Trend", unit: "kg",
+        .init(id: "body_weight_trend", displayName: "Weight Stability", unit: "% change",
               category: .bodyComposition, evidenceTier: .tier2,
-              optimalLow: nil, optimalHigh: nil,
+              optimalLow: 0, optimalHigh: 5,
               higherIsBetter: false,
-              description: "Body weight — trend over 30 days is more meaningful than absolute value.",
-              longevityContext: "Stable weight within a healthy range is associated with better longevity outcomes. Unintentional weight loss is a key mortality risk signal."),
+              description: "Absolute % change in body weight vs 6 months ago (14-day average vs 6-month-ago 30-day window).",
+              longevityContext: "Unintentional weight loss >5% of body weight over 6–12 months is a clinical red flag for underlying illness. Weight stability within a healthy range is a more actionable longevity target than any single absolute weight."),
 
         .init(id: "bmi", displayName: "BMI", unit: "kg/m²",
               category: .bodyComposition, evidenceTier: .tier2,

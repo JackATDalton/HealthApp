@@ -4,6 +4,7 @@ import Charts
 
 struct RecoveryDetailView: View {
     let result: RecoveryScoreResult?
+    let snapshot: [String: Double]
 
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \DailySnapshot.date) private var snapshots: [DailySnapshot]
@@ -157,12 +158,23 @@ struct RecoveryDetailView: View {
 
             VStack(spacing: 0) {
                 ForEach(Array(result.inputs.sortedInputs.enumerated()), id: \.element.name) { idx, input in
-                    componentRow(
-                        name: input.name,
-                        score: input.score,
-                        weight: input.weight,
-                        showDivider: idx < result.inputs.sortedInputs.count - 1
-                    )
+                    NavigationLink {
+                        RecoveryComponentDetailView(
+                            componentKey:  input.key,
+                            componentName: input.name,
+                            score:         input.score,
+                            weight:        input.weight,
+                            snapshot:      snapshot
+                        )
+                    } label: {
+                        componentRow(
+                            name:        input.name,
+                            score:       input.score,
+                            weight:      input.weight,
+                            showDivider: idx < result.inputs.sortedInputs.count - 1
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .background(VColor.backgroundSecondary)
@@ -174,7 +186,6 @@ struct RecoveryDetailView: View {
     private func componentRow(name: String, score: Double?, weight: Double, showDivider: Bool) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: VSpacing.m) {
-                // Component name + weight badge
                 VStack(alignment: .leading, spacing: 2) {
                     Text(name)
                         .font(VFont.bodyMediumFont)
@@ -186,15 +197,12 @@ struct RecoveryDetailView: View {
 
                 Spacer()
 
-                // Score bar + value
                 if let score {
                     HStack(spacing: VSpacing.s) {
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
                                 RoundedRectangle(cornerRadius: 2)
-                                    .fill(VColor.borderSubtle)
-                                    .frame(height: 4)
-
+                                    .fill(VColor.borderSubtle).frame(height: 4)
                                 RoundedRectangle(cornerRadius: 2)
                                     .fill(scoreColor(score))
                                     .frame(width: geo.size.width * (score / 100), height: 4)
@@ -212,14 +220,16 @@ struct RecoveryDetailView: View {
                         .font(VFont.bodyMediumFont)
                         .foregroundStyle(VColor.textTertiary)
                 }
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(VColor.textTertiary)
             }
             .padding(.horizontal, VSpacing.l)
             .padding(.vertical, VSpacing.m)
 
             if showDivider {
-                Divider()
-                    .background(VColor.borderSubtle)
-                    .padding(.leading, VSpacing.l)
+                Divider().background(VColor.borderSubtle).padding(.leading, VSpacing.l)
             }
         }
     }

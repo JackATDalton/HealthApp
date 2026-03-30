@@ -18,9 +18,10 @@ final class HealthKitMetricsCollector {
 
     func collect(userAge: Int) async -> [String: Double] {
         // Run all independent queries concurrently
-        async let hrv         = fetchOvernightAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"))
-        async let rhr         = fetchOvernightMin(.restingHeartRate, unit: heartRateUnit)
-        async let hrvBaseline = fetchDailyAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"), daysBack: 30)
+        async let hrv              = fetchOvernightAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"))
+        async let rhr              = fetchOvernightMin(.restingHeartRate, unit: heartRateUnit)
+        async let hrvBaseline      = fetchDailyAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"), daysBack: 30)
+        async let hrvLongtermAvg   = fetchAllTimeAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"))
         async let rhrBaseline = fetchDailyAverage(.restingHeartRate,         unit: heartRateUnit,    daysBack: 30)
         async let rrBaseline  = fetchDailyAverage(.respiratoryRate,          unit: heartRateUnit,    daysBack: 30)
         async let vo2max      = fetchMax(.vo2Max,              unit: .init(from: "ml/kg*min"),       daysBack: 30)
@@ -31,6 +32,7 @@ final class HealthKitMetricsCollector {
         async let activeEnergy = fetchDailyAverageSum(.activeEnergyBurned, unit: .kilocalorie(), daysBack: 30)
         async let respRate    = fetchOvernightAverage(.respiratoryRate, unit: heartRateUnit)
         async let standHours  = fetchAverageDailyStandHours(daysBack: 30)
+        async let weightChange = fetchWeightChangePercent6M()
         async let bodyMass    = fetchLatestSample(.bodyMass,          unit: .gramUnit(with: .kilo))
         async let heightM     = fetchLatestSample(.height,            unit: .meter())
         async let bodyFat     = fetchLatestSample(.bodyFatPercentage, unit: .percent())
@@ -43,9 +45,10 @@ final class HealthKitMetricsCollector {
         async let workouts    = workoutAnalyser.fetchWorkoutResult(userAge: userAge)
 
         // Await all
-        let hrvVal         = await hrv
-        let rhrVal         = await rhr
-        let hrvBaselineVal = await hrvBaseline
+        let hrvVal              = await hrv
+        let rhrVal              = await rhr
+        let hrvBaselineVal      = await hrvBaseline
+        let hrvLongtermAvgVal   = await hrvLongtermAvg
         let rhrBaselineVal = await rhrBaseline
         let rrBaselineVal  = await rrBaseline
         let vo2Val         = await vo2max
@@ -56,6 +59,7 @@ final class HealthKitMetricsCollector {
         let energyVal      = await activeEnergy
         let rrVal          = await respRate
         let standVal       = await standHours
+        let weightChangeVal = await weightChange
         let massVal        = await bodyMass
         let heightVal      = await heightM
         let fatVal         = await bodyFat
@@ -70,9 +74,10 @@ final class HealthKitMetricsCollector {
         var snapshot: [String: Double] = [:]
 
         // Cardiovascular
-        if let v = hrvVal         { snapshot["hrv"]               = v }
-        if let v = rhrVal         { snapshot["rhr"]               = v }
-        if let v = hrvBaselineVal { snapshot["hrv_baseline"]      = v }
+        if let v = hrvVal             { snapshot["hrv"]                   = v }
+        if let v = rhrVal             { snapshot["rhr"]                   = v }
+        if let v = hrvBaselineVal     { snapshot["hrv_baseline"]          = v }
+        if let v = hrvLongtermAvgVal  { snapshot["hrv_longterm_baseline"] = v }
         if let v = rhrBaselineVal { snapshot["rhr_baseline"]      = v }
         if let v = rrBaselineVal  { snapshot["rr_baseline"]       = v }
         if let v = vo2Val         { snapshot["vo2max"]            = v }
@@ -92,7 +97,7 @@ final class HealthKitMetricsCollector {
         snapshot["training_load"]     = workResult.trainingLoadWeekly
 
         // Body composition — BMI computed from latest height + mass; falls back to nil if unavailable
-        if let v = massVal { snapshot["body_weight_trend"] = v }
+        if let v = weightChangeVal { snapshot["body_weight_trend"] = v }
         if let mass = massVal, let height = heightVal, height > 0 {
             snapshot["bmi"] = mass / (height * height)
         }
@@ -137,6 +142,20 @@ final class HealthKitMetricsCollector {
             ) { _, samples, _ in
                 let value = (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: unit)
                 continuation.resume(returning: value)
+            }
+            store.execute(query)
+        }
+    }
+
+    /// Average across all available HealthKit data (no start-date filter) — used for long-term baselines.
+    private func fetchAllTimeAverage(_ id: HKQuantityTypeIdentifier, unit: HKUnit) async -> Double? {
+        await withCheckedContinuation { continuation in
+            let query = HKStatisticsQuery(
+                quantityType: HKQuantityType(id),
+                quantitySamplePredicate: nil,
+                options: .discreteAverage
+            ) { _, stats, _ in
+                continuation.resume(returning: stats?.averageQuantity()?.doubleValue(for: unit))
             }
             store.execute(query)
         }
@@ -348,6 +367,37 @@ final class HealthKitMetricsCollector {
                 // Count only hours where the user actually stood (value == 0 = .stood)
                 let stoodCount = samples.filter { $0.value == HKCategoryValueAppleStandHour.stood.rawValue }.count
                 continuation.resume(returning: Double(stoodCount) / Double(daysBack))
+            }
+            store.execute(query)
+        }
+    }
+
+    /// Absolute % change in body weight between recent 14-day average and 6-month-ago 30-day window.
+    /// Returns nil if either window has no data.
+    private func fetchWeightChangePercent6M() async -> Double? {
+        let now = Date()
+        let cal = Calendar.current
+        let recentStart   = cal.date(byAdding: .day, value: -14,  to: now)!
+        let historicEnd   = cal.date(byAdding: .day, value: -165, to: now)!
+        let historicStart = cal.date(byAdding: .day, value: -195, to: now)!
+
+        async let recent   = fetchAverageInRange(.bodyMass, unit: .gramUnit(with: .kilo), from: recentStart,   to: now)
+        async let historic = fetchAverageInRange(.bodyMass, unit: .gramUnit(with: .kilo), from: historicStart, to: historicEnd)
+
+        guard let r = await recent, let h = await historic, h > 0 else { return nil }
+        return abs((r - h) / h) * 100
+    }
+
+    /// Average of all samples in a specific date range.
+    private func fetchAverageInRange(_ id: HKQuantityTypeIdentifier, unit: HKUnit, from start: Date, to end: Date) async -> Double? {
+        await withCheckedContinuation { continuation in
+            let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
+            let query = HKStatisticsQuery(
+                quantityType: HKQuantityType(id),
+                quantitySamplePredicate: predicate,
+                options: .discreteAverage
+            ) { _, stats, _ in
+                continuation.resume(returning: stats?.averageQuantity()?.doubleValue(for: unit))
             }
             store.execute(query)
         }

@@ -123,6 +123,7 @@ struct MetricGridView: View {
         case "strength_sessions":  return "\(Int(value.rounded()))"
         case "daylight_exposure":  return "\(Int(value.rounded()))"
         case "wrist_temp":         return String(format: "%+.1f", value)
+        case "body_weight_trend":  return String(format: "%.1f%%", value)
         default:                   return String(format: "%.0f", value)
         }
     }
