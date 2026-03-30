@@ -19,7 +19,7 @@ struct PlanView: View {
                 if isGenerating {
                     streamingView
                 } else if let plan = latestPlan {
-                    planContentView(plan: plan)
+                    planContentView(plan)
                 } else {
                     emptyStateView
                 }
