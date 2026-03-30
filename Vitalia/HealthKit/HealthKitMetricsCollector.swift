@@ -107,6 +107,9 @@ final class HealthKitMetricsCollector {
             snapshot["awake_pct"]        = night.awakePct * 100
         }
         snapshot["sleep_debt"] = sleepResult.rollingDebtMinutes
+        if let consistency = sleepConsistencyMinutes(from: sleepResult.recent7Days) {
+            snapshot["sleep_consistency"] = consistency
+        }
 
         // Sleep / Stress
         if let v = rrVal      { snapshot["respiratory_rate"]  = v }
@@ -300,6 +303,28 @@ final class HealthKitMetricsCollector {
             }
             store.execute(query)
         }
+    }
+
+    /// Standard deviation of bedtimes (in minutes) across the last N sleep sessions.
+    /// Bedtimes are expressed as minutes after 18:00 to avoid midnight wraparound.
+    /// Returns nil if fewer than 3 sessions are available.
+    private func sleepConsistencyMinutes(from sessions: [HealthKitSleepAnalyser.SleepSession]) -> Double? {
+        guard sessions.count >= 3 else { return nil }
+        let cal = Calendar.current
+        let referenceHour = 18  // 6pm — earlier than any realistic bedtime
+
+        let bedtimeOffsets: [Double] = sessions.map { session in
+            let comps = cal.dateComponents([.hour, .minute], from: session.startDate)
+            let hour   = comps.hour   ?? 0
+            let minute = comps.minute ?? 0
+            var offset = Double((hour - referenceHour) * 60 + minute)
+            if offset < 0 { offset += 24 * 60 }   // shouldn't occur with 6pm reference
+            return offset
+        }
+
+        let mean     = bedtimeOffsets.reduce(0, +) / Double(bedtimeOffsets.count)
+        let variance = bedtimeOffsets.reduce(0) { $0 + pow($1 - mean, 2) } / Double(bedtimeOffsets.count)
+        return sqrt(variance)
     }
 
     /// Average daily stand hours over the last N days, counted from Apple Watch Stand ring.

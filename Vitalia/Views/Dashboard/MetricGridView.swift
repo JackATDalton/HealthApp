@@ -59,9 +59,7 @@ struct MetricGridView: View {
                     let progress  = eval?.progress ?? evaluateProgress(metric: metric, value: value, config: config)
 
                     Button {
-                        if let value, isEnabled {
-                            onMetricTap?(metric)
-                        }
+                        if isEnabled { onMetricTap?(metric) }
                     } label: {
                         MetricCardView(
                             name: metric.displayName,
