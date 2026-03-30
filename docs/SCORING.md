@@ -115,10 +115,10 @@ The curve is intentionally steep near the edges of optimal (motivating small imp
 
 ---
 
-**Deep Sleep** | Tier 1 | `20–30% of night` optimal
+**Deep Sleep** | Tier 1 | `≥ 13% of night` optimal
 - *What it measures:* Percentage of total sleep in slow-wave (N3) sleep.
-- *Optimal:* 20–30%
-- *Evidence:* Deep sleep is the primary stage for cellular repair, human growth hormone secretion, and memory consolidation. Normal values in young adults are 15–25%; the 20–30% target reflects optimal rather than average. Deep sleep declines significantly with age (~2% per decade after 30). Chronic deep sleep deprivation is implicated in Alzheimer's risk via impaired glymphatic amyloid clearance (Xie et al., Science 2013).
+- *Optimal:* ≥ 13% (no upper penalty — more is unconditionally better)
+- *Evidence:* Deep sleep is the primary stage for cellular repair, human growth hormone secretion, and memory consolidation. Deep sleep declines significantly with age (~2% per decade after 30). Chronic deep sleep deprivation is implicated in Alzheimer's risk via impaired glymphatic amyloid clearance (Xie et al., Science 2013). The floor of 13% reflects the clinical threshold below which deep sleep is genuinely concerning; Apple Watch actigraphy typically reads 13–20% for healthy sleepers (slightly lower than lab polysomnography). Values in the 13–20% range score 100 — penalising this range would incorrectly flag normal, healthy sleep architecture.
 
 ---
 

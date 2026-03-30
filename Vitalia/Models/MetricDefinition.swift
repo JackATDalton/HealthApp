@@ -103,10 +103,10 @@ struct MetricDefinition: Identifiable {
 
         .init(id: "deep_sleep_pct", displayName: "Deep Sleep", unit: "% of night",
               category: .sleep, evidenceTier: .tier1,
-              optimalLow: 20, optimalHigh: 30,
+              optimalLow: 13, optimalHigh: nil,
               higherIsBetter: true,
               description: "Percentage of total sleep in deep (slow-wave) stage.",
-              longevityContext: "Deep sleep is critical for cellular repair, HGH secretion, and memory consolidation. Declines with age."),
+              longevityContext: "Deep sleep is critical for cellular repair, HGH secretion, and memory consolidation. Declines with age. 13% is the clinical floor for healthy adults; Apple Watch typically reads 13–20% for good sleepers. More is unconditionally better."),
 
         .init(id: "rem_sleep_pct", displayName: "REM Sleep", unit: "% of night",
               category: .sleep, evidenceTier: .tier1,
