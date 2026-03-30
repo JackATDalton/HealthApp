@@ -46,10 +46,10 @@ struct MetricDefinition: Identifiable {
 
         .init(id: "rhr", displayName: "Resting Heart Rate", unit: "bpm",
               category: .cardiovascular, evidenceTier: .tier1,
-              optimalLow: 40, optimalHigh: 45,
+              optimalLow: 45, optimalHigh: 50,
               higherIsBetter: false,
               description: "Heart rate at complete rest.",
-              longevityContext: "Every 10 bpm increase in RHR above 45 associates with ~16% increased cardiovascular mortality. Optimal range is 40–45 bpm."),
+              longevityContext: "Every 10 bpm increase in RHR above 45 associates with ~16% increased cardiovascular mortality. Optimal range is 45–50 bpm."),
 
         .init(id: "hrv", displayName: "Heart Rate Variability", unit: "ms",
               category: .cardiovascular, evidenceTier: .tier1,
