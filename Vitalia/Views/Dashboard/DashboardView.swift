@@ -9,45 +9,44 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
-                ScrollView {
-                    VStack(spacing: VSpacing.xl) {
-                        // Recovery + Longevity scores
-                        RecoveryScoreCard(result: appState.recoveryResult) {
-                            showRecoveryDetail = true
-                        }
-
-                        LongevityScoreCard(score: appState.longevityScore)
-
-                        // Focus metric (from last plan)
-                        if let _ = appState.focusMetricID {
-                            FocusMetricCard(metricID: appState.focusMetricID)
-                        }
-
-                        // Re-plan nudge
-                        if appState.showRePlanNudge {
-                            RePlanNudgeBanner {
-                                // navigate to plan tab
-                            } onDismiss: {
-                                withAnimation { appState.showRePlanNudge = false }
-                            }
-                        }
-
-                        // Metric grid
-                        MetricGridView(
-                            snapshots: appState.metricSnapshot.isEmpty
-                                ? MetricGridView.mockSnapshots   // show mock until first sync
-                                : appState.metricSnapshot,
-                            configs: metricConfigs
-                        )
+            ScrollView {
+                VStack(spacing: VSpacing.xl) {
+                    // Recovery + Longevity scores
+                    RecoveryScoreCard(result: appState.recoveryResult) {
+                        showRecoveryDetail = true
                     }
-                    .padding(.horizontal, VSpacing.l)
-                    .padding(.top, VSpacing.m)
-                    .padding(.bottom, 100)
-                }
 
-                // Sync status footer
+                    LongevityScoreCard(score: appState.longevityScore)
+
+                    // Focus metric (from last plan)
+                    if let _ = appState.focusMetricID {
+                        FocusMetricCard(metricID: appState.focusMetricID)
+                    }
+
+                    // Re-plan nudge
+                    if appState.showRePlanNudge {
+                        RePlanNudgeBanner {
+                            // navigate to plan tab
+                        } onDismiss: {
+                            withAnimation { appState.showRePlanNudge = false }
+                        }
+                    }
+
+                    // Metric grid
+                    MetricGridView(
+                        snapshots: appState.metricSnapshot.isEmpty
+                            ? MetricGridView.mockSnapshots
+                            : appState.metricSnapshot,
+                        configs: metricConfigs
+                    )
+                }
+                .padding(.horizontal, VSpacing.l)
+                .padding(.top, VSpacing.m)
+                .padding(.bottom, 60)
+            }
+            .overlay(alignment: .bottom) {
                 syncFooter
+                    .allowsHitTesting(false)
             }
             .background(VColor.backgroundPrimary.ignoresSafeArea())
             .navigationTitle("Vitalia")
