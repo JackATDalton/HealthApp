@@ -32,6 +32,8 @@ struct MetricDefinition: Identifiable {
     let optimalLow: Double?
     let optimalHigh: Double?
     let higherIsBetter: Bool
+    /// Short label describing the time window the displayed value covers, e.g. "30-day avg", "Last night".
+    let dataWindow: String
     let description: String
     let longevityContext: String
 
@@ -41,6 +43,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier1,
               optimalLow: 55, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day max",
               description: "Maximal oxygen uptake during exercise.",
               longevityContext: "Strongest single predictor of all-cause mortality. Top 2.5% VO₂ Max associates with ~5× lower risk vs bottom quartile. Apple Watch value adjusted +3.5 mL/kg/min for known underestimation."),
 
@@ -48,6 +51,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier1,
               optimalLow: 45, optimalHigh: 50,
               higherIsBetter: false,
+              dataWindow: "30-day avg",
               description: "Heart rate at complete rest.",
               longevityContext: "Every 10 bpm increase in RHR above 45 associates with ~16% increased cardiovascular mortality. Optimal range is 45–50 bpm."),
 
@@ -55,6 +59,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier1,
               optimalLow: nil, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day avg",
               description: "Milliseconds variation between heartbeats (SDNN overnight).",
               longevityContext: "Reflects autonomic nervous system balance. Higher HRV associates with lower all-cause mortality and better cardiovascular health. Scored relative to personal baseline."),
 
@@ -62,6 +67,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier1,
               optimalLow: 100, optimalHigh: 120,
               higherIsBetter: false,
+              dataWindow: "Latest reading",
               description: "Peak arterial pressure during heartbeat.",
               longevityContext: "Strongest modifiable risk factor for cardiovascular disease and stroke. Optimal is ≤120/80, with longevity data suggesting ~110/70 as ideal."),
 
@@ -69,6 +75,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier1,
               optimalLow: 97, optimalHigh: 100,
               higherIsBetter: true,
+              dataWindow: "Last night",
               description: "Percentage of haemoglobin carrying oxygen.",
               longevityContext: "Chronic low SpO₂ is associated with increased all-cause mortality. Overnight dips below 90% are a sleep apnoea red flag."),
 
@@ -76,6 +83,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier2,
               optimalLow: nil, optimalHigh: 70,
               higherIsBetter: false,
+              dataWindow: "30-day avg",
               description: "Average heart rate during casual walking.",
               longevityContext: "Downward trend reflects improving cardiovascular efficiency."),
 
@@ -83,6 +91,7 @@ struct MetricDefinition: Identifiable {
               category: .cardiovascular, evidenceTier: .tier2,
               optimalLow: 20, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "Latest reading",
               description: "Heart rate drop in the first minute after peak exercise.",
               longevityContext: "HR recovery < 12 bpm in 1 minute is an independent predictor of mortality (Cole et al., NEJM 1999)."),
 
@@ -91,6 +100,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier1,
               optimalLow: 7, optimalHigh: 8.5,
               higherIsBetter: true,
+              dataWindow: "Last night",
               description: "Total time asleep per night.",
               longevityContext: "U-shaped mortality curve. Both <6 hrs and >9 hrs associate with higher all-cause mortality. Optimal window is 7–8.5 hrs."),
 
@@ -98,6 +108,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier1,
               optimalLow: 90, optimalHigh: 100,
               higherIsBetter: true,
+              dataWindow: "Last night",
               description: "Percentage of time in bed actually asleep.",
               longevityContext: "Low efficiency reflects fragmented sleep; strongly associated with metabolic and cardiovascular disease risk."),
 
@@ -105,6 +116,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier1,
               optimalLow: 13, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "Last night",
               description: "Percentage of total sleep in deep (slow-wave) stage.",
               longevityContext: "Deep sleep is critical for cellular repair, HGH secretion, and memory consolidation. Declines with age. 13% is the clinical floor for healthy adults; Apple Watch typically reads 13–20% for good sleepers. More is unconditionally better."),
 
@@ -112,6 +124,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier1,
               optimalLow: 20, optimalHigh: 25,
               higherIsBetter: true,
+              dataWindow: "Last night",
               description: "Percentage of sleep in REM stage.",
               longevityContext: "REM sleep is essential for emotional regulation and memory. Low REM associated with increased dementia risk."),
 
@@ -119,6 +132,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier1,
               optimalLow: 0, optimalHigh: 8,
               higherIsBetter: false,
+              dataWindow: "Last night",
               description: "Percentage of time in bed spent awake.",
               longevityContext: "Frequent awakenings disrupt restorative sleep cycles and are associated with elevated cortisol and inflammation. Up to 8% is normal healthy variation; above 10% signals meaningful fragmentation."),
 
@@ -126,6 +140,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier1,
               optimalLow: 0, optimalHigh: 30,
               higherIsBetter: false,
+              dataWindow: "5-night rolling",
               description: "Cumulative sleep deficit vs 7.5-hr target over last 5 nights.",
               longevityContext: "Cumulative sleep restriction impairs cognition, metabolism, and immune function even when individual nights appear normal."),
 
@@ -133,6 +148,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier2,
               optimalLow: 0, optimalHigh: 20,
               higherIsBetter: false,
+              dataWindow: "7-night avg",
               description: "Standard deviation of bedtime across last 7 nights.",
               longevityContext: "Irregular sleep timing disrupts circadian rhythms, a key driver of metabolic and cardiovascular disease."),
 
@@ -140,6 +156,7 @@ struct MetricDefinition: Identifiable {
               category: .sleep, evidenceTier: .tier2,
               optimalLow: 12, optimalHigh: 15,
               higherIsBetter: false,
+              dataWindow: "Last night",
               description: "Breathing rate during sleep.",
               longevityContext: "Stable overnight respiratory rate signals healthy sleep. Elevation is an early indicator of illness, stress, or sleep apnoea."),
 
@@ -148,6 +165,7 @@ struct MetricDefinition: Identifiable {
               category: .activity, evidenceTier: .tier1,
               optimalLow: 10_000, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day avg",
               description: "Average daily steps over the last 30 days.",
               longevityContext: "10k steps/day associates with ~50% lower all-cause mortality vs 4k (Paluch et al., Lancet 2022). More is better — no upper penalty."),
 
@@ -155,20 +173,23 @@ struct MetricDefinition: Identifiable {
               category: .activity, evidenceTier: .tier1,
               optimalLow: 180, optimalHigh: nil,
               higherIsBetter: true,
-              description: "Minutes at 60–70% max HR per week.",
+              dataWindow: "30-day avg",
+              description: "Minutes at 70–77.5% max HR per week — Apple Health Zone 2.",
               longevityContext: "Zone 2 training is the primary driver of mitochondrial biogenesis and VO₂ Max improvements. Research (Attia, San Millán) supports 180+ min/week."),
 
         .init(id: "vigorous_minutes", displayName: "Vigorous / Week", unit: "min/wk",
               category: .activity, evidenceTier: .tier1,
               optimalLow: 75, optimalHigh: nil,
               higherIsBetter: true,
-              description: "Weekly minutes at vigorous intensity — effort hard enough that you can only say a few words without pausing for breath. Tracked as >80% max HR, which sits within the ACSM vigorous range of 77–93% max HR.",
-              longevityContext: "WHO and NHS guidelines define vigorous activity as effort that makes you breathe hard and fast enough that speaking more than a few words requires pausing — equivalent to roughly 77–93% max HR (ACSM). Both recommend 75 min/week of vigorous activity as the minimum threshold equivalent to 150 min/week of moderate activity. Gebel et al. (2015, JAMA Internal Medicine) found that substituting vigorous for moderate activity reduced all-cause mortality independently of total exercise volume, even after adjusting for total MET-hours. High-intensity work above the lactate threshold is also the primary driver of VO₂ Max ceiling extension beyond what Zone 2 alone achieves (Helgerud et al., 2007, Medicine & Science in Sports & Exercise). The app uses >80% max HR as a conservative proxy — this captures the upper portion of the vigorous range where the VO₂ Max adaptation is strongest."),
+              dataWindow: "30-day avg",
+              description: "Weekly minutes at vigorous intensity — Apple Health Zone 3 and above (>77.5% max HR).",
+              longevityContext: "WHO and NHS guidelines recommend 75 min/week of vigorous activity as the minimum threshold equivalent to 150 min/week of moderate activity. Gebel et al. (2015, JAMA Internal Medicine) found that substituting vigorous for moderate activity reduced all-cause mortality independently of total exercise volume, even after adjusting for total MET-hours. High-intensity work above the lactate threshold is also the primary driver of VO₂ Max ceiling extension beyond what Zone 2 alone achieves (Helgerud et al., 2007, Medicine & Science in Sports & Exercise). Vigorous is defined as Apple Health Zone 3+ (>77.5% max HR), matching the zones shown in Apple Health."),
 
         .init(id: "strength_sessions", displayName: "Strength Sessions", unit: "sessions/wk",
               category: .activity, evidenceTier: .tier1,
               optimalLow: 3, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day avg",
               description: "Resistance training sessions per week.",
               longevityContext: "Muscle mass and strength are independent predictors of all-cause mortality. 3+ sessions/week significantly reduces risk of falls and metabolic disease."),
 
@@ -176,6 +197,7 @@ struct MetricDefinition: Identifiable {
               category: .activity, evidenceTier: .tier2,
               optimalLow: nil, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day avg",
               description: "Aggregate training stress from the last 7 days (HR × duration).",
               longevityContext: "Helps identify load/recovery imbalances. Contextualises recovery score — sustained high load with low recovery signals overtraining."),
 
@@ -185,6 +207,7 @@ struct MetricDefinition: Identifiable {
               category: .bodyComposition, evidenceTier: .tier2,
               optimalLow: 0, optimalHigh: 5,
               higherIsBetter: false,
+              dataWindow: "6-month trend",
               description: "Absolute % change in body weight vs 6 months ago (14-day average vs 6-month-ago 30-day window).",
               longevityContext: "Unintentional weight loss >5% of body weight over 6–12 months is a clinical red flag for underlying illness. Weight stability within a healthy range is a more actionable longevity target than any single absolute weight."),
 
@@ -192,6 +215,7 @@ struct MetricDefinition: Identifiable {
               category: .bodyComposition, evidenceTier: .tier2,
               optimalLow: 20, optimalHigh: 24,
               higherIsBetter: false,
+              dataWindow: "Latest reading",
               description: "Body mass index. A crude proxy — body fat % is more informative.",
               longevityContext: "Optimal longevity-associated BMI is 20–24. Above 25 associates with progressively higher mortality, particularly for cardiovascular disease."),
 
@@ -200,6 +224,7 @@ struct MetricDefinition: Identifiable {
               category: .stressRecovery, evidenceTier: .tier2,
               optimalLow: 10, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day avg",
               description: "Daily meditation or mindfulness practice.",
               longevityContext: "Consistent mindfulness practice reduces cortisol, improves HRV, and is associated with reduced inflammatory markers."),
 
@@ -207,6 +232,7 @@ struct MetricDefinition: Identifiable {
               category: .stressRecovery, evidenceTier: .tier2,
               optimalLow: 30, optimalHigh: nil,
               higherIsBetter: true,
+              dataWindow: "30-day avg",
               description: "Minutes of outdoor light exposure per day.",
               longevityContext: "Morning daylight anchors the circadian clock, improving sleep quality, mood, and metabolic health."),
 
@@ -214,6 +240,7 @@ struct MetricDefinition: Identifiable {
               category: .stressRecovery, evidenceTier: .tier3,
               optimalLow: -0.3, optimalHigh: 0.3,
               higherIsBetter: false,
+              dataWindow: "Last night",
               description: "Deviation from personal wrist temperature baseline during sleep.",
               longevityContext: "Elevation signals illness, immune activity, or hormonal changes. Useful as an early warning signal rather than a direct longevity metric."),
     ]

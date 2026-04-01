@@ -14,6 +14,7 @@ final class HealthKitSleepAnalyser {
     struct SleepSession {
         let date: Date          // calendar date this session "belongs to" (morning it ended)
         let startDate: Date     // bedtime — start of first sleep sample (used for consistency calc)
+        let endDate: Date       // wake time — end of last sleep sample
         let totalSleep: TimeInterval      // core + deep + REM, seconds
         let deepSleep: TimeInterval
         let remSleep: TimeInterval
@@ -136,6 +137,7 @@ final class HealthKitSleepAnalyser {
             return SleepSession(
                 date:        wakeDate,
                 startDate:   firstSample.startDate,
+                endDate:     lastSample.endDate,
                 totalSleep:  totalSleep,
                 deepSleep:   deepSleep,
                 remSleep:    remSleep,

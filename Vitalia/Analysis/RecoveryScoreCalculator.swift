@@ -7,7 +7,7 @@ enum RecoveryScoreCalculator {
     struct Inputs {
         // Today's overnight values (nil = unavailable)
         var hrv:              Double?   // ms
-        var rhr:              Double?   // bpm (overnight minimum)
+        var rhr:              Double?   // bpm (average heart rate during sleep)
         var sleepEfficiency:  Double?   // 0–100
         var deepSleepPct:     Double?   // 0–100
         var awakePct:         Double?   // 0–100 (of time in bed)
@@ -108,8 +108,8 @@ enum RecoveryScoreCalculator {
 
     static func inputs(from snapshot: [String: Double]) -> Inputs {
         Inputs(
-            hrv:              snapshot["hrv"],
-            rhr:              snapshot["rhr"],
+            hrv:              snapshot["hrv_today"],   // overnight reading (primary dashboard value is now 30-day avg)
+            rhr:              snapshot["rhr_today"],   // overnight min
             sleepEfficiency:  snapshot["sleep_efficiency"],
             deepSleepPct:     snapshot["deep_sleep_pct"],
             awakePct:         snapshot["awake_pct"],

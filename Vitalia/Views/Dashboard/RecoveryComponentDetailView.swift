@@ -167,10 +167,10 @@ struct RecoveryComponentDetailView: View {
     }
 
     private var hrvInfo: ComponentInfo {
-        let hrv      = snapshot["hrv"].map      { String(format: "%.0f ms", $0) } ?? "—"
+        let hrv      = snapshot["hrv_today"].map    { String(format: "%.0f ms", $0) } ?? "—"
         let baseline = snapshot["hrv_baseline"].map { String(format: "%.0f ms", $0) } ?? "—"
         let ratioStr: String
-        if let h = snapshot["hrv"], let b = snapshot["hrv_baseline"], b > 0 {
+        if let h = snapshot["hrv_today"], let b = snapshot["hrv_baseline"], b > 0 {
             ratioStr = String(format: "%.2f", h / b)
         } else { ratioStr = "—" }
 
@@ -187,22 +187,22 @@ struct RecoveryComponentDetailView: View {
     }
 
     private var rhrInfo: ComponentInfo {
-        let rhr      = snapshot["rhr"].map          { String(format: "%.0f bpm", $0) } ?? "—"
+        let rhr      = snapshot["rhr_today"].map    { String(format: "%.0f bpm", $0) } ?? "—"
         let baseline = snapshot["rhr_baseline"].map { String(format: "%.0f bpm", $0) } ?? "—"
         let deltaStr: String
-        if let r = snapshot["rhr"], let b = snapshot["rhr_baseline"] {
+        if let r = snapshot["rhr_today"], let b = snapshot["rhr_baseline"] {
             let d = r - b
             deltaStr = d >= 0 ? String(format: "+%.0f bpm", d) : String(format: "%.0f bpm", d)
         } else { deltaStr = "—" }
 
         return ComponentInfo(
-            subtitle: "Overnight minimum heart rate vs your 30-day baseline",
+            subtitle: "Average heart rate during sleep vs your 30-day resting HR baseline",
             rawValues: [
-                (label: "Last night",        value: rhr,      highlight: true),
+                (label: "Last night (avg)",  value: rhr,      highlight: true),
                 (label: "30-day average",    value: baseline, highlight: false),
                 (label: "vs baseline",       value: deltaStr, highlight: false),
             ],
-            scoringExplanation: "Your overnight minimum RHR is compared to your personal 30-day average. ≥3 bpm below baseline → 100 (exceptional recovery). Within 0–5 bpm above → 75–35. Every bpm above baseline reflects increased sympathetic nervous system activity, which reduces recovery quality.",
+            scoringExplanation: "Your average heart rate during last night's sleep is compared to your personal 30-day resting HR average. ≥3 bpm below baseline → 100 (exceptional recovery). Within 0–5 bpm above → 75–35. Every bpm above baseline reflects increased sympathetic nervous system activity, which reduces recovery quality.",
             improvementTip: "Elevated RHR is often caused by poor sleep, alcohol, dehydration, illness, or high training load accumulated over several days. Identify the cause before training hard."
         )
     }

@@ -23,9 +23,11 @@ final class HealthKitWorkoutAnalyser {
         let workouts = await fetchWorkouts(daysBack: 30)
 
         let maxHR             = Double(220 - userAge)
-        let zone2Low          = maxHR * 0.60
-        let zone2High         = maxHR * 0.70
-        let vigorousThreshold = maxHR * 0.80
+        // Apple Health zone definitions: zones divide 70–100% of maxHR into 4 equal 7.5% bands.
+        // Zone 1: <70% | Zone 2: 70–77.5% | Zone 3: 77.5–85% | Zone 4: 85–92.5% | Zone 5: >92.5%
+        let zone2Low          = maxHR * 0.700
+        let zone2High         = maxHR * 0.775
+        let vigorousThreshold = maxHR * 0.775  // Zone 3+ = vigorous
 
         var zone2Secs:    Double = 0
         var vigorousSecs: Double = 0

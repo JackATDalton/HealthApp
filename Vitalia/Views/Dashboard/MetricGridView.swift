@@ -68,6 +68,7 @@ struct MetricGridView: View {
                             tier: metric.evidenceTier.rawValue,
                             status: status,
                             progress: progress,
+                            timeframe: metric.dataWindow,
                             isEnabled: isEnabled
                         )
                     }

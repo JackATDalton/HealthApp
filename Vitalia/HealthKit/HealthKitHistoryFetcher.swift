@@ -222,8 +222,9 @@ final class HealthKitHistoryFetcher {
     private func workoutZoneHistory(vigorous: Bool, range: MetricTimeRange, userAge: Int) async -> [HistoryPoint] {
         let workouts  = await fetchWorkouts(from: range.startDate, limit: 250)
         let maxHR     = Double(220 - userAge)
-        let z2Low     = maxHR * 0.60, z2High = maxHR * 0.70
-        let vigThresh = maxHR * 0.80
+        // Apple Health zones: Zone 2 = 70–77.5%, Zone 3+ (vigorous) = >77.5%
+        let z2Low     = maxHR * 0.700, z2High = maxHR * 0.775
+        let vigThresh = maxHR * 0.775
 
         var pairs: [(Date, Double)] = []
         for workout in workouts where !isStrength(workout) {

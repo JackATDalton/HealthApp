@@ -45,6 +45,7 @@ struct MetricDetailView: View {
             ScrollView {
                 VStack(spacing: VSpacing.xl) {
                     headerSection
+                    todayBaselineSection
                     historySection
                     rangeSection
                     contextSection
@@ -96,6 +97,45 @@ struct MetricDetailView: View {
                 .font(VFont.captionFont)
                 .foregroundStyle(VColor.textTertiary)
                 .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Today vs 30-Day Baseline
+
+    @ViewBuilder
+    private var todayBaselineSection: some View {
+        if let todayValue = snapshot["\(metric.id)_today"],
+           let baselineValue = currentValue {
+            VStack(alignment: .leading, spacing: VSpacing.m) {
+                SectionHeaderView(title: "Today vs 30-Day Average")
+                HStack(spacing: VSpacing.m) {
+                    todayBaselineStat(label: "Tonight", value: todayValue, isTodayReading: true)
+                    Divider().frame(height: 44)
+                    todayBaselineStat(label: "30-Day Avg", value: baselineValue, isTodayReading: false)
+                }
+                .padding(VSpacing.l)
+                .frame(maxWidth: .infinity)
+                .background(VColor.backgroundSecondary)
+                .clipShape(RoundedRectangle(cornerRadius: VRadius.xl))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func todayBaselineStat(label: String, value: Double, isTodayReading: Bool) -> some View {
+        VStack(spacing: VSpacing.xs) {
+            Text(label)
+                .font(VFont.captionFont)
+                .foregroundStyle(VColor.textTertiary)
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(formatValue(value))
+                    .font(VFont.bodyLargeFont.bold())
+                    .foregroundStyle(isTodayReading ? VColor.textPrimary : VColor.accent)
+                Text(metric.unit)
+                    .font(VFont.captionFont)
+                    .foregroundStyle(VColor.textTertiary)
+            }
         }
         .frame(maxWidth: .infinity)
     }

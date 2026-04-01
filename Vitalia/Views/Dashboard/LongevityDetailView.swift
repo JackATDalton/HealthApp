@@ -191,7 +191,7 @@ struct LongevityDetailView: View {
                             )
                         }
                     } label: {
-                        metricRow(ms: ms, showDivider: idx < result.metricScores.count - 1)
+                        metricRow(ms: ms, definition: metric, showDivider: idx < result.metricScores.count - 1)
                     }
                     .buttonStyle(.plain)
                 }
@@ -202,7 +202,7 @@ struct LongevityDetailView: View {
         }
     }
 
-    private func metricRow(ms: LongevityScoreCalculator.MetricScore, showDivider: Bool) -> some View {
+    private func metricRow(ms: LongevityScoreCalculator.MetricScore, definition: MetricDefinition?, showDivider: Bool) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: VSpacing.m) {
                 VStack(alignment: .leading, spacing: 2) {
@@ -212,9 +212,19 @@ struct LongevityDetailView: View {
                             .foregroundStyle(VColor.textPrimary)
                         TierBadgeView(tier: ms.tier.rawValue)
                     }
-                    Text(ms.status.label)
-                        .font(VFont.captionFont)
-                        .foregroundStyle(scoreColor(ms.score))
+                    HStack(spacing: 4) {
+                        Text(ms.status.label)
+                            .font(VFont.captionFont)
+                            .foregroundStyle(scoreColor(ms.score))
+                        if let window = definition?.dataWindow {
+                            Text("·")
+                                .font(VFont.captionFont)
+                                .foregroundStyle(VColor.textTertiary)
+                            Text(window)
+                                .font(VFont.captionFont)
+                                .foregroundStyle(VColor.textTertiary)
+                        }
+                    }
                 }
 
                 Spacer()

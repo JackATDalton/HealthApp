@@ -31,6 +31,7 @@ struct MetricCardView: View {
     let tier: Int               // 1, 2, or 3
     let status: MetricStatus
     let progress: Double        // 0–1 fill of the bottom bar (how far through optimal range)
+    var timeframe: String = ""
     var trendDirection: TrendDirection = .stable
     var isEnabled: Bool = true
 
@@ -44,6 +45,12 @@ struct MetricCardView: View {
                         .foregroundStyle(isEnabled ? VColor.textSecondary : VColor.textTertiary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
+
+                    if !timeframe.isEmpty {
+                        Text(timeframe)
+                            .font(VFont.captionFont)
+                            .foregroundStyle(isEnabled ? VColor.textTertiary : VColor.textTertiary.opacity(0.5))
+                    }
 
                     HStack(alignment: .firstTextBaseline, spacing: 3) {
                         Text(value)
