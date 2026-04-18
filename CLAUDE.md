@@ -91,3 +91,15 @@ Max HR is calculated as `220 - userAge`. **Both files must be kept in sync** —
 ## Spec
 
 `docs/SPEC.md` is the authoritative product specification. Read it for intent behind any metric, scoring formula, or UX decision before making changes.
+
+## Feature & Issue Tracking
+
+**New features** are tracked in `docs/NewFeatures.md` as a markdown checklist.
+- When the user describes a new feature to implement, add it as `- [ ] <description>` before starting work.
+- Tick it off (`- [x]`) immediately after it is implemented and committed.
+
+**Bugs and issues** are tracked in `docs/Issues.md` as a markdown checklist.
+- When a bug or issue is identified (by the user or discovered during work), add it as `- [ ] <description>` before starting work.
+- Tick it off (`- [x]`) immediately after it is fixed and committed.
+
+Always commit updates to these docs in the same commit as the implementation.
