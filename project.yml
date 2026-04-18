@@ -49,11 +49,47 @@ targets:
         com.apple.developer.healthkit: true
         keychain-access-groups:
           - "$(AppIdentifierPrefix)com.jackdalton.Vitalia"
+        com.apple.security.application-groups:
+          - group.com.jackdalton.Vitalia
+    dependencies:
+      - target: VitaliaWidget
+        embed: true
+        codeSign: true
     settings:
       base:
         INFOPLIST_FILE: Vitalia/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.jackdalton.Vitalia
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  VitaliaWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: VitaliaWidget
+      - path: Vitalia/DesignSystem/Colors.swift
+      - path: Vitalia/DesignSystem/Spacing.swift
+      - path: Vitalia/DesignSystem/Typography.swift
+    info:
+      path: VitaliaWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Vitalia
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: VitaliaWidget/VitaliaWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.jackdalton.Vitalia
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jackdalton.Vitalia.VitaliaWidget
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        APPLICATION_EXTENSION_API_ONLY: YES
 
   VitaliaTests:
     type: bundle.unit-test

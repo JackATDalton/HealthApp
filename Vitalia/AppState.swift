@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import Observation
 import HealthKit
+import WidgetKit
 
 @Observable
 @MainActor
@@ -99,6 +100,9 @@ final class AppState {
         if !snapshotAtLastPlan.isEmpty {
             showRePlanNudge = shouldNudgeRePlan(current: snapshot, previous: snapshotAtLastPlan)
         }
+
+        // 7. Push scores to widget
+        writeWidgetData(plan: nil)
     }
 
     // MARK: - Called after a plan is saved
@@ -107,6 +111,7 @@ final class AppState {
         focusMetricID      = plan.focusMetricID
         snapshotAtLastPlan = metricSnapshot
         showRePlanNudge    = false
+        writeWidgetData(plan: plan)
     }
 
     // MARK: - Private helpers
@@ -150,6 +155,52 @@ final class AppState {
         }
 
         try? context.save()
+    }
+
+    // MARK: - Widget data
+
+    private func writeWidgetData(plan: LongevityPlan?) {
+        guard let defaults = UserDefaults(suiteName: "group.com.jackdalton.Vitalia") else { return }
+
+        if let recovery = recoveryResult, !recovery.isIncomplete {
+            defaults.set(recovery.score,        forKey: "widget.recoveryScore")
+            defaults.set(recovery.band.rawValue, forKey: "widget.recoveryBand")
+            defaults.set(true,                   forKey: "widget.recoveryValid")
+        } else {
+            defaults.set(false, forKey: "widget.recoveryValid")
+        }
+
+        if let longevity = longevityResult {
+            defaults.set(longevity.score, forKey: "widget.longevityScore")
+            defaults.set(true,             forKey: "widget.longevityValid")
+        } else {
+            defaults.set(false, forKey: "widget.longevityValid")
+        }
+
+        if let plan {
+            let (_, days) = WorkoutDay.parse(from: plan.fullText)
+            if let today = todayWorkoutDay(from: days) {
+                defaults.set(today.dayName,          forKey: "widget.workoutDayName")
+                defaults.set(today.isRest,            forKey: "widget.workoutIsRest")
+                defaults.set(today.type     ?? "",    forKey: "widget.workoutType")
+                defaults.set(today.duration ?? "",    forKey: "widget.workoutDuration")
+                defaults.set(today.zones    ?? "",    forKey: "widget.workoutZones")
+                defaults.set(today.notes    ?? "",    forKey: "widget.workoutNotes")
+            }
+        }
+
+        defaults.set(Date().timeIntervalSince1970, forKey: "widget.lastUpdated")
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    private func todayWorkoutDay(from days: [WorkoutDay]) -> WorkoutDay? {
+        let weekday  = Calendar.current.component(.weekday, from: Date())
+        let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        let todayName = dayNames[weekday - 1]
+        return days.first {
+            $0.dayName.lowercased().contains(todayName.lowercased()) ||
+            todayName.lowercased().contains(String($0.dayName.lowercased().prefix(3)))
+        }
     }
 
     private func shouldNudgeRePlan(current: [String: Double], previous: [String: Double]) -> Bool {
