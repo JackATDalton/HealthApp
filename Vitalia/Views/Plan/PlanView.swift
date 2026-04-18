@@ -346,6 +346,7 @@ struct PlanSectionView: View {
         case let t where t.contains("action"):   "checklist"
         case let t where t.contains("quick"):    "star.fill"
         case let t where t.contains("focus"):    "scope"
+        case let t where t.contains("workout"):  "figure.run"
         default:                                  "doc.text"
         }
     }

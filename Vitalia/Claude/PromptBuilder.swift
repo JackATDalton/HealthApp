@@ -34,19 +34,37 @@ enum PromptBuilder {
     - Prioritise Tier 1 metrics — they carry the strongest longevity evidence
     - Every recommendation must be specific and actionable — never generic
     - Write in second person. Be direct, motivating, and clinically grounded
-    - Aim for around 600 words total
+    - Aim for around 700 words total across all sections
 
     Structure your response with exactly these section headers on their own line:
 
-    ## Health Summary
     ## Priority Interventions
     ## 90-Day Action Plan
     ## Quick Wins
     ## Focus Metric
+    ## Weekly Workout Plan
 
     In the Focus Metric section, your very first line must be:
     metric_id: [id]
     where [id] is one of the metric IDs listed in the user message. Then explain why this metric is your primary focus and give 2–3 specific improvement tactics.
+
+    In the Weekly Workout Plan section, generate a structured 7-day workout plan based on the user's recovery score, training load, and priority interventions. Use exactly this format:
+
+    context: [one sentence explaining the plan intensity given recovery score and load]
+    ### Monday
+    type: [workout type, e.g. Zone 2 Run]
+    duration: [e.g. 45 min]
+    zones: [e.g. Zone 2 — keep HR 135–155 bpm]
+    notes: [one specific coaching cue]
+    ### Tuesday
+    rest
+    ### Wednesday
+    type: [workout type]
+    duration: [e.g. 30 min]
+    zones: [e.g. Strength — moderate load]
+    notes: [one specific coaching cue]
+
+    ...and so on for all 7 days. Use "rest" for rest days. Distribute workouts to match the user's Zone 2 and vigorous minute targets and strength session targets.
     """
 
     // MARK: - User message

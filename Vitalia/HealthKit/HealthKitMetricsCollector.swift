@@ -16,7 +16,7 @@ final class HealthKitMetricsCollector {
 
     // MARK: - Main collect
 
-    func collect(userAge: Int) async -> [String: Double] {
+    func collect(userAge: Int) async -> (snapshot: [String: Double], recentWorkouts: [HealthKitWorkoutAnalyser.RecentWorkout]) {
         // Phase 1: all queries that don't depend on the sleep window run fully concurrently.
         async let hrvBaseline    = fetchDailyAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"), daysBack: 30)
         async let hrvLongtermAvg = fetchAllTimeAverage(.heartRateVariabilitySDNN, unit: .init(from: "ms"))
@@ -134,7 +134,7 @@ final class HealthKitMetricsCollector {
         if let v = mindfulVal  { snapshot["mindful_minutes"]  = v }
         if let v = daylightVal { snapshot["daylight_exposure"] = v / 60 }      // avg daily seconds → minutes
 
-        return snapshot
+        return (snapshot, workResult.recentWorkouts)
     }
 
     // MARK: - Generic query helpers

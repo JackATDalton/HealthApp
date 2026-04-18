@@ -10,11 +10,22 @@ final class HealthKitWorkoutAnalyser {
         self.store = store
     }
 
+    struct RecentWorkout: Identifiable, Sendable {
+        let id = UUID()
+        let date: Date
+        let displayType: String
+        let durationMinutes: Double
+        let zone2Minutes: Double
+        let vigorousMinutes: Double
+        let avgHRPercent: Double   // 0–1 fraction of max HR
+    }
+
     struct WorkoutResult {
         let zone2MinutesWeekly:    Double   // 30-day total ÷ 4.286 weeks
         let vigorousMinutesWeekly: Double
         let strengthSessionsWeekly: Double  // Double so fractional weeks average correctly
         let trainingLoadWeekly:    Double   // arbitrary units per week
+        let recentWorkouts:        [RecentWorkout]  // last 7 workouts, newest first
     }
 
     // MARK: - Fetch
@@ -33,6 +44,7 @@ final class HealthKitWorkoutAnalyser {
         var vigorousSecs: Double = 0
         var strengthCount        = 0
         var trainingLoad: Double = 0
+        var recentWorkouts: [RecentWorkout] = []
 
         for workout in workouts {
             if isStrengthWorkout(workout) {
@@ -44,6 +56,16 @@ final class HealthKitWorkoutAnalyser {
             if hrSamples.isEmpty {
                 if !isStrengthWorkout(workout) {
                     zone2Secs += workout.duration
+                }
+                if recentWorkouts.count < 7 {
+                    recentWorkouts.append(RecentWorkout(
+                        date: workout.startDate,
+                        displayType: workoutDisplayName(workout),
+                        durationMinutes: workout.duration / 60,
+                        zone2Minutes: 0,
+                        vigorousMinutes: 0,
+                        avgHRPercent: 0
+                    ))
                 }
                 continue
             }
@@ -77,9 +99,23 @@ final class HealthKitWorkoutAnalyser {
             zone2Secs    += z2Secs
             vigorousSecs += vigSecs
 
+            let avgHRPct: Double
             if count > 0 {
-                let avgHRPct = (sumHR / Double(count)) / maxHR
+                avgHRPct = (sumHR / Double(count)) / maxHR
                 trainingLoad += avgHRPct * (workout.duration / 60)
+            } else {
+                avgHRPct = 0
+            }
+
+            if recentWorkouts.count < 7 {
+                recentWorkouts.append(RecentWorkout(
+                    date: workout.startDate,
+                    displayType: workoutDisplayName(workout),
+                    durationMinutes: workout.duration / 60,
+                    zone2Minutes: z2Secs / 60,
+                    vigorousMinutes: vigSecs / 60,
+                    avgHRPercent: avgHRPct
+                ))
             }
         }
 
@@ -89,7 +125,8 @@ final class HealthKitWorkoutAnalyser {
             zone2MinutesWeekly:     (zone2Secs    / 60) / weeks,
             vigorousMinutesWeekly:  (vigorousSecs / 60) / weeks,
             strengthSessionsWeekly: Double(strengthCount) / weeks,
-            trainingLoadWeekly:     trainingLoad / weeks
+            trainingLoadWeekly:     trainingLoad / weeks,
+            recentWorkouts:         recentWorkouts
         )
     }
 
@@ -130,6 +167,28 @@ final class HealthKitWorkoutAnalyser {
                 continuation.resume(returning: (samples as? [HKQuantitySample]) ?? [])
             }
             store.execute(query)
+        }
+    }
+
+    private func workoutDisplayName(_ workout: HKWorkout) -> String {
+        switch workout.workoutActivityType {
+        case .running:                      return "Run"
+        case .cycling:                      return "Cycle"
+        case .walking:                      return "Walk"
+        case .swimming:                     return "Swim"
+        case .rowing:                       return "Row"
+        case .elliptical:                   return "Elliptical"
+        case .yoga:                         return "Yoga"
+        case .pilates:                      return "Pilates"
+        case .traditionalStrengthTraining:  return "Strength"
+        case .functionalStrengthTraining:   return "Functional Strength"
+        case .highIntensityIntervalTraining: return "HIIT"
+        case .coreTraining:                 return "Core"
+        case .crossTraining:                return "Cross Training"
+        case .hiking:                       return "Hike"
+        case .stairClimbing:                return "Stair Climb"
+        case .jumpRope:                     return "Jump Rope"
+        default:                            return "Workout"
         }
     }
 

@@ -22,6 +22,14 @@ struct DashboardView: View {
                         showLongevityDetail = true
                     }
 
+                    // Zone time card
+                    if appState.metricSnapshot["zone2_minutes"] != nil || appState.metricSnapshot["vigorous_minutes"] != nil {
+                        ZoneTimeCard(
+                            zone2Minutes: appState.metricSnapshot["zone2_minutes"],
+                            vigorousMinutes: appState.metricSnapshot["vigorous_minutes"]
+                        )
+                    }
+
                     // Focus metric (from last plan)
                     if let _ = appState.focusMetricID {
                         FocusMetricCard(metricID: appState.focusMetricID) {

@@ -24,6 +24,9 @@ final class AppState {
     // MARK: - Live metric snapshot (keyed by MetricDefinition.id)
     var metricSnapshot: [String: Double] = [:]
 
+    // MARK: - Recent workouts (populated after sync)
+    var recentWorkouts: [HealthKitWorkoutAnalyser.RecentWorkout] = []
+
     // Per-metric evaluated scores (for dashboard cards)
     var metricEvalResults: [String: MetricEvaluator.Result] = [:]
 
@@ -51,8 +54,10 @@ final class AppState {
 
         // 1. Collect all HealthKit metrics (concurrent queries)
         let collector = HealthKitMetricsCollector(store: hkPermissions.store)
-        let snapshot  = await collector.collect(userAge: age)
-        metricSnapshot = snapshot
+        let collected = await collector.collect(userAge: age)
+        let snapshot  = collected.snapshot
+        metricSnapshot  = snapshot
+        recentWorkouts  = collected.recentWorkouts
 
         // 2. Calculate Recovery Score
         let recoveryInputs = RecoveryScoreCalculator.inputs(from: snapshot)

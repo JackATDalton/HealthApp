@@ -1,0 +1,7 @@
+- [ ] Condense plan - remove one of first two sections and make it produce a structured dashboard rather than just plain text - have dashboard precoded and Claude just fills it in 
+- [ ] Suggested workouts based on recovery score and current plan 
+- [ ] Plan should create example workout cards that have details and should have actual example plan for a week
+- [ ] Widget showing recovery and longevity score 
+- [ ] Borderline should switch to good 
+- [ ] Time in zones this week dashboard 
+- [ ] Analysis of recent workouts 

@@ -282,7 +282,7 @@ private extension MetricStatus {
     var label: String {
         switch self {
         case .optimal:    "Optimal"
-        case .borderline: "Borderline"
+        case .borderline: "Good"
         case .outOfRange: "Out of Range"
         case .noData:     "No Data"
         case .disabled:   "Disabled"

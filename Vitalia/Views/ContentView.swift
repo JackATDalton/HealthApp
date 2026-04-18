@@ -10,6 +10,11 @@ struct ContentView: View {
                     Label("Dashboard", systemImage: "heart.text.square.fill")
                 }
 
+            WorkoutsView()
+                .tabItem {
+                    Label("Workouts", systemImage: "figure.run")
+                }
+
             PlanView()
                 .tabItem {
                     Label("Plan", systemImage: "text.document.fill")
