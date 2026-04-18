@@ -339,6 +339,28 @@ struct PlanSection: Identifiable {
 struct PlanSectionView: View {
     let section: PlanSection
 
+    // Converts raw markdown body to a rendered Text view.
+    // Pre-processes ### subheadings → **bold** so AttributedString handles them.
+    @ViewBuilder private var renderedBody: some View {
+        let processed = section.body
+            .components(separatedBy: "\n")
+            .map { line -> String in
+                let t = line.trimmingCharacters(in: .whitespaces)
+                if t.hasPrefix("### ") { return "**\(t.dropFirst(4))**" }
+                if t.hasPrefix("## ")  { return "**\(t.dropFirst(3))**" }
+                return line
+            }
+            .joined(separator: "\n")
+        if let attr = try? AttributedString(
+            markdown: processed,
+            options: .init(interpretedSyntax: .inlinesOnlyPreservingWhitespace)
+        ) {
+            Text(attr)
+        } else {
+            Text(section.body)
+        }
+    }
+
     private var sectionIcon: String {
         switch section.title.lowercased() {
         case let t where t.contains("summary"):  "chart.bar.doc.horizontal"
@@ -369,7 +391,7 @@ struct PlanSectionView: View {
             }
             .padding(.horizontal, VSpacing.l)
 
-            Text(section.body)
+            renderedBody
                 .font(VFont.bodyLargeFont)
                 .foregroundStyle(VColor.textSecondary)
                 .lineSpacing(4)

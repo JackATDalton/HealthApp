@@ -5,7 +5,7 @@ struct ZoneTimeCard: View {
     let vigorousMinutes: Double?
 
     private static let zone2Target:    Double = 180
-    private static let vigorousTarget: Double = 25
+    private static let vigorousTarget: Double = 75
 
     var body: some View {
         VStack(alignment: .leading, spacing: VSpacing.m) {
@@ -19,8 +19,7 @@ struct ZoneTimeCard: View {
                     label: "Zone 2",
                     subtitle: "Aerobic base",
                     minutes: zone2Minutes,
-                    target: Self.zone2Target,
-                    color: VColor.optimal
+                    target: Self.zone2Target
                 )
 
                 Divider().background(VColor.textTertiary.opacity(0.15))
@@ -29,8 +28,7 @@ struct ZoneTimeCard: View {
                     label: "Vigorous",
                     subtitle: "Zone 3–5",
                     minutes: vigorousMinutes,
-                    target: Self.vigorousTarget,
-                    color: VColor.accent
+                    target: Self.vigorousTarget
                 )
             }
         }
@@ -47,11 +45,17 @@ private struct ZoneRow: View {
     let subtitle: String
     let minutes: Double?
     let target: Double
-    let color: Color
 
     private var progress: Double {
         guard let m = minutes else { return 0 }
         return min(1.0, m / target)
+    }
+
+    private var barColor: Color {
+        if progress >= 0.90 { return VColor.excellent }
+        if progress >= 0.75 { return VColor.optimal }
+        if progress >= 0.25 { return VColor.borderline }
+        return VColor.outOfRange
     }
 
     private var valueText: String {
@@ -80,7 +84,7 @@ private struct ZoneRow: View {
                 HStack(alignment: .firstTextBaseline, spacing: 3) {
                     Text(valueText)
                         .font(.system(size: VFont.bodyMedium, weight: .bold, design: .rounded))
-                        .foregroundStyle(minutes != nil ? color : VColor.textTertiary)
+                        .foregroundStyle(minutes != nil ? barColor : VColor.textTertiary)
                     Text(targetText)
                         .font(VFont.captionFont)
                         .foregroundStyle(VColor.textTertiary)
@@ -90,11 +94,11 @@ private struct ZoneRow: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(color.opacity(0.12))
+                        .fill(barColor.opacity(0.12))
                         .frame(height: 5)
 
                     Capsule()
-                        .fill(color)
+                        .fill(barColor)
                         .frame(width: geo.size.width * progress, height: 5)
                         .animation(.spring(duration: 0.6), value: progress)
                 }

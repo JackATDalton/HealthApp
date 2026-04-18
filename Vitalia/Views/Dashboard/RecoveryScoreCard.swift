@@ -134,11 +134,7 @@ private struct InputBarRow: View {
         }
     }
 
-    private func scoreColor(_ score: Double) -> Color {
-        if score >= 75 { return VColor.recoveryGreen }
-        if score >= 50 { return VColor.recoveryAmber }
-        return VColor.recoveryRed
-    }
+    private func scoreColor(_ score: Double) -> Color { VColor.forScore(score) }
 }
 
 // MARK: - Baseline building state

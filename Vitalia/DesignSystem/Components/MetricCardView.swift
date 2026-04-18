@@ -1,10 +1,11 @@
 import SwiftUI
 
 enum MetricStatus {
-    case optimal, borderline, outOfRange, disabled, noData
+    case excellent, optimal, borderline, outOfRange, disabled, noData
 
     var color: Color {
         switch self {
+        case .excellent:  VColor.excellent
         case .optimal:    VColor.optimal
         case .borderline: VColor.borderline
         case .outOfRange: VColor.outOfRange
@@ -15,6 +16,7 @@ enum MetricStatus {
 
     var faintColor: Color {
         switch self {
+        case .excellent:  VColor.excellentFaint
         case .optimal:    VColor.optimalFaint
         case .borderline: VColor.borderlineFaint
         case .outOfRange: VColor.outOfRangeFaint

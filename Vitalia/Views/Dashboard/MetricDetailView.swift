@@ -473,8 +473,9 @@ private struct RangeBarView: View {
 private extension MetricStatus {
     var label: String {
         switch self {
-        case .optimal:    "Optimal"
-        case .borderline: "Good"
+        case .excellent:  "Excellent"
+        case .optimal:    "Good"
+        case .borderline: "Borderline"
         case .outOfRange: "Out of Range"
         case .noData:     "No Data"
         case .disabled:   "Disabled"

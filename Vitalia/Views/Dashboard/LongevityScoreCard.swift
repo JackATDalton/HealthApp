@@ -6,17 +6,12 @@ struct LongevityScoreCard: View {
 
     private var scoreColor: Color {
         guard let score else { return VColor.textTertiary }
-        if score >= 75 { return VColor.optimal }
-        if score >= 50 { return VColor.borderline }
-        return VColor.outOfRange
+        return VColor.forScore(score)
     }
 
     private var scoreLabel: String {
         guard let score else { return "—" }
-        if score >= 80 { return "Excellent" }
-        if score >= 65 { return "Good" }
-        if score >= 45 { return "Needs Work" }
-        return "Critical"
+        return VColor.labelForScore(score)
     }
 
     var body: some View {

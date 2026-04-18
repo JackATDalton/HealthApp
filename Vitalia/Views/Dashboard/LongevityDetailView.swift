@@ -262,18 +262,9 @@ struct LongevityDetailView: View {
 
     // MARK: - Helpers
 
-    private func scoreColor(_ score: Double) -> Color {
-        if score >= 75 { return VColor.optimal }
-        if score >= 50 { return VColor.borderline }
-        return VColor.outOfRange
-    }
+    private func scoreColor(_ score: Double) -> Color { VColor.forScore(score) }
 
-    private func scoreLabel(_ score: Double) -> String {
-        if score >= 80 { return "EXCELLENT" }
-        if score >= 65 { return "GOOD" }
-        if score >= 45 { return "NEEDS WORK" }
-        return "CRITICAL"
-    }
+    private func scoreLabel(_ score: Double) -> String { VColor.labelForScore(score).uppercased() }
 }
 
 // MARK: - MetricStatus label (local extension if not already defined)
@@ -281,8 +272,9 @@ struct LongevityDetailView: View {
 private extension MetricStatus {
     var label: String {
         switch self {
-        case .optimal:    "Optimal"
-        case .borderline: "Good"
+        case .excellent:  "Excellent"
+        case .optimal:    "Good"
+        case .borderline: "Borderline"
         case .outOfRange: "Out of Range"
         case .noData:     "No Data"
         case .disabled:   "Disabled"

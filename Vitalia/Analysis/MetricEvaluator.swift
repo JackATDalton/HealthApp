@@ -58,8 +58,9 @@ enum MetricEvaluator {
     // MARK: - Status from score
 
     static func statusFromScore(_ score: Double) -> MetricStatus {
-        if score >= 85 { return .optimal }
-        if score >= 55 { return .borderline }
+        if score >= 90 { return .excellent }
+        if score >= 75 { return .optimal }
+        if score >= 50 { return .borderline }
         return .outOfRange
     }
 

@@ -29,6 +29,8 @@ enum VColor {
     static let accentFaint          = Color(hex: "#2A1A10")
 
     // MARK: - Semantic (metric status)
+    static let excellent            = Color(hex: "#2D8653")
+    static let excellentFaint       = Color(hex: "#0A2118")
     static let optimal              = Color(hex: "#4CAF7A")
     static let optimalFaint         = Color(hex: "#0D2B1A")
     static let borderline           = Color(hex: "#E8B84A")
@@ -36,6 +38,22 @@ enum VColor {
     static let outOfRange           = Color(hex: "#E05252")
     static let outOfRangeFaint      = Color(hex: "#2B0D0D")
     static let disabled             = Color(hex: "#3A3A3A")
+
+    // MARK: - Score helpers
+
+    static func forScore(_ score: Double) -> Color {
+        if score >= 90 { return excellent }
+        if score >= 75 { return optimal }
+        if score >= 50 { return borderline }
+        return outOfRange
+    }
+
+    static func labelForScore(_ score: Double) -> String {
+        if score >= 90 { return "Excellent" }
+        if score >= 75 { return "Good" }
+        if score >= 50 { return "Borderline" }
+        return "Out of Range"
+    }
 
     // MARK: - Recovery bands
     static let recoveryGreen        = Color(hex: "#4CAF7A")

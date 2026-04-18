@@ -460,7 +460,6 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					04A74775E55C7A69BECF52B1 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					1E776FABE1B792D17D4721DE = {
@@ -731,6 +730,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Vitalia/Vitalia.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = VARUH939ZA;
 				INFOPLIST_FILE = Vitalia/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -833,6 +833,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Vitalia/Vitalia.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = VARUH939ZA;
 				INFOPLIST_FILE = Vitalia/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

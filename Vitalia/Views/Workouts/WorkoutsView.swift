@@ -256,17 +256,15 @@ struct RecentWorkoutRow: View {
         let cal = Calendar.current
         if cal.isDateInToday(workout.date)     { return "Today" }
         if cal.isDateInYesterday(workout.date) { return "Yesterday" }
-        return workout.date.formatted(.dateTime.weekday(.wide))
+        return workout.date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated))
     }
 
     private var durationText: String {
         "\(Int(workout.durationMinutes.rounded())) min"
     }
 
-    private var zoneBarZ2Width: Double {
-        let total = workout.zone2Minutes + workout.vigorousMinutes
-        guard total > 0 else { return 0 }
-        return workout.zone2Minutes / total
+    private var nonZoneMinutes: Double {
+        max(0, workout.durationMinutes - workout.zone2Minutes - workout.vigorousMinutes)
     }
 
     var body: some View {
@@ -289,38 +287,44 @@ struct RecentWorkoutRow: View {
             }
 
             // Zone breakdown bar
-            if workout.zone2Minutes > 0 || workout.vigorousMinutes > 0 {
-                VStack(alignment: .leading, spacing: 4) {
-                    GeometryReader { geo in
-                        HStack(spacing: 2) {
-                            let z2Width = geo.size.width * zoneBarZ2Width
-                            let vigWidth = geo.size.width * (1 - zoneBarZ2Width)
-
-                            if workout.zone2Minutes > 0 {
-                                Capsule()
-                                    .fill(VColor.optimal)
-                                    .frame(width: max(z2Width - 1, 0), height: 6)
-                            }
-                            if workout.vigorousMinutes > 0 {
-                                Capsule()
-                                    .fill(VColor.accent)
-                                    .frame(width: max(vigWidth - 1, 0), height: 6)
-                            }
+            VStack(alignment: .leading, spacing: 4) {
+                GeometryReader { geo in
+                    let total = max(workout.durationMinutes, 1)
+                    let greyW = geo.size.width * (nonZoneMinutes / total)
+                    let z2W   = geo.size.width * (workout.zone2Minutes / total)
+                    let vigW  = geo.size.width * (workout.vigorousMinutes / total)
+                    HStack(spacing: 2) {
+                        if nonZoneMinutes > 0 {
+                            Capsule().fill(VColor.textTertiary.opacity(0.4))
+                                .frame(width: max(greyW - 1, 0), height: 6)
                         }
-                    }
-                    .frame(height: 6)
-
-                    HStack(spacing: VSpacing.m) {
                         if workout.zone2Minutes > 0 {
-                            Label("\(Int(workout.zone2Minutes.rounded())) min Z2", systemImage: "circle.fill")
-                                .font(VFont.captionFont)
-                                .foregroundStyle(VColor.optimal)
+                            Capsule().fill(VColor.optimal)
+                                .frame(width: max(z2W - 1, 0), height: 6)
                         }
                         if workout.vigorousMinutes > 0 {
-                            Label("\(Int(workout.vigorousMinutes.rounded())) min Vig", systemImage: "circle.fill")
-                                .font(VFont.captionFont)
-                                .foregroundStyle(VColor.accent)
+                            Capsule().fill(VColor.excellent)
+                                .frame(width: max(vigW - 1, 0), height: 6)
                         }
+                    }
+                }
+                .frame(height: 6)
+
+                HStack(spacing: VSpacing.m) {
+                    if nonZoneMinutes > 0 {
+                        Label("\(Int(nonZoneMinutes.rounded())) min Z1", systemImage: "circle.fill")
+                            .font(VFont.captionFont)
+                            .foregroundStyle(VColor.textTertiary)
+                    }
+                    if workout.zone2Minutes > 0 {
+                        Label("\(Int(workout.zone2Minutes.rounded())) min Z2", systemImage: "circle.fill")
+                            .font(VFont.captionFont)
+                            .foregroundStyle(VColor.optimal)
+                    }
+                    if workout.vigorousMinutes > 0 {
+                        Label("\(Int(workout.vigorousMinutes.rounded())) min Vig", systemImage: "circle.fill")
+                            .font(VFont.captionFont)
+                            .foregroundStyle(VColor.excellent)
                     }
                 }
             }

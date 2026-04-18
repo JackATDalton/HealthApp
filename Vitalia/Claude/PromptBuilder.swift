@@ -262,7 +262,8 @@ enum PromptBuilder {
 private extension MetricStatus {
     var promptLabel: String {
         switch self {
-        case .optimal:    "optimal"
+        case .excellent:  "excellent"
+        case .optimal:    "good"
         case .borderline: "borderline"
         case .outOfRange: "out of range"
         case .noData:     "no data"
