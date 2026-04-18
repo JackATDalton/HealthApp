@@ -83,6 +83,7 @@ targets:
       - sdk: SwiftUI.framework
     settings:
       base:
+        PRODUCT_NAME: VitaliaWidget
         PRODUCT_BUNDLE_IDENTIFIER: com.jackdalton.Vitalia.VitaliaWidget
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete

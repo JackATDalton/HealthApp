@@ -740,6 +740,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackdalton.Vitalia.VitaliaWidget;
+				PRODUCT_NAME = VitaliaWidget;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
@@ -865,6 +866,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackdalton.Vitalia.VitaliaWidget;
+				PRODUCT_NAME = VitaliaWidget;
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
