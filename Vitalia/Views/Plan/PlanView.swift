@@ -351,10 +351,7 @@ struct PlanSectionView: View {
                 return line
             }
             .joined(separator: "\n")
-        if let attr = try? AttributedString(
-            markdown: processed,
-            options: .init(interpretedSyntax: .inlinesOnly)
-        ) {
+        if let attr = try? AttributedString(markdown: processed) {
             Text(attr)
         } else {
             Text(section.body)
