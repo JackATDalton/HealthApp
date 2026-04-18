@@ -82,7 +82,7 @@ struct VitaliaWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: VitaliaTimelineProvider()) { entry in
             VitaliaWidgetView(entry: entry)
-                .containerBackground(VColor.backgroundPrimary, for: .widget)
+                .containerBackground(WColor.backgroundPrimary, for: .widget)
         }
         .configurationDisplayName("Vitalia")
         .description("Recovery, longevity, and today's workout.")

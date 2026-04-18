@@ -11,7 +11,6 @@
 		0AE4FC8A97ED8E66B9E5ECE3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB5AE06436E9D234A5F4700 /* ContentView.swift */; };
 		0DC60BF430EBB20EA3898442 /* HealthKitProfileImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5FCC26C020395AEE807F00 /* HealthKitProfileImporter.swift */; };
 		131F8E9049D54F7FD32F7A67 /* OnboardingFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0889B56ECC42DD8D6C598280 /* OnboardingFlowUITests.swift */; };
-		1643A752F795A33A8A3D6DD4 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F93537384EEDC792CA1D623 /* Spacing.swift */; };
 		17F0E6F4803F2DF42ED1A348 /* MetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4D391EC569906429948E843 /* MetricsSettingsView.swift */; };
 		1A8238B0E963EB82ECBDD194 /* HealthKitWorkoutAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DFE392076C4E9A1C4687F /* HealthKitWorkoutAnalyser.swift */; };
 		1C63D915D6D3432C74588B0A /* RecoveryScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86CEAB1B2BCD52577BF49063 /* RecoveryScoreCard.swift */; };
@@ -31,6 +30,7 @@
 		4473C3A3E52C4BFB9D68D4F3 /* ZoneTimeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC354A68464E8BAE100B9A1 /* ZoneTimeCard.swift */; };
 		450FC77A3B8357B23415E4B9 /* LongevityPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D388648662722A1C0FEBE01 /* LongevityPlan.swift */; };
 		48C94F8F90834B2BE6D26709 /* WorkoutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD2207D3E6152ACD1ACF911 /* WorkoutsView.swift */; };
+		4AE5C9C89F8A9AF43E2EB467 /* WidgetTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789FD031510885F45EE4EE1D /* WidgetTokens.swift */; };
 		4C51DED43CEAB47177CF22A2 /* RePlanNudgeBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCA6BA00989E82556F7CD46 /* RePlanNudgeBanner.swift */; };
 		53C0BA5FD318D8F33E17C8C7 /* TrendAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A0D7CE4E96B25B588C12A9 /* TrendAnalyser.swift */; };
 		5493D2FEFCE9421B3E2BA9E4 /* MetricCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF0A496E7488ECDF5232708 /* MetricCardView.swift */; };
@@ -42,7 +42,6 @@
 		7A7DD8CB4B982D3A4F2EFE1E /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C02A486DDC3786B43FA5C3 /* OnboardingContainerView.swift */; };
 		7AE643986A068F9C4D72EC76 /* RecoveryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DF84FCE7B0190695141C5 /* RecoveryDetailView.swift */; };
 		7B4B9B2D3B44B53296EBFEC5 /* VitaliaWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373F831D74EA212C5E037A2A /* VitaliaWidgetView.swift */; };
-		7BF51AA3E53073FE4E4D2A33 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0FD143375BB819D9C499EBD /* Typography.swift */; };
 		802B47A592044ED561AE7528 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 05ABE07F384CCF899D60A112 /* Assets.xcassets */; };
 		8238D15B8F96ADC221604608 /* LongevityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF5B15CF6F3A84DE307F449 /* LongevityDetailView.swift */; };
 		82ADC34F417B4DE957157DEC /* VitaliaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830453114A10AFE865F0EB6F /* VitaliaWidgetBundle.swift */; };
@@ -58,7 +57,6 @@
 		A453F7100DDF27B7B8ED1480 /* ClaudeAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3111AA65BA0ABBE5F5F6B2F1 /* ClaudeAPIClient.swift */; };
 		A6D4B5DAD59B457F9F984662 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DFCCE345C1411A2D624B3F2 /* SwiftUI.framework */; };
 		AB45106CAAC011215AF92F4B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BADF4909A05AD524627CE55 /* WidgetKit.framework */; };
-		B272A17B1EAAFB821B0E62EA /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D353105DDE5A38FC5416C /* Colors.swift */; };
 		B4FD733D20601088F1A565AF /* WorkoutDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA685771F4185B980D552DE /* WorkoutDay.swift */; };
 		B8FC5148A27A09A5F8F0DA3A /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75910582368CD334AA8C23C1 /* PlanView.swift */; };
 		BEBE80D853504667D2417F40 /* HealthKitMetricsCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72EDDA819210CD507C4EDC1 /* HealthKitMetricsCollector.swift */; };
@@ -153,6 +151,7 @@
 		6DFCCE345C1411A2D624B3F2 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		6E5FCC26C020395AEE807F00 /* HealthKitProfileImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitProfileImporter.swift; sourceTree = "<group>"; };
 		75910582368CD334AA8C23C1 /* PlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
+		789FD031510885F45EE4EE1D /* WidgetTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTokens.swift; sourceTree = "<group>"; };
 		802255ACAA18A7DD0D59762C /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		809472766D33E1F5BC198415 /* HealthKitPassiveReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitPassiveReader.swift; sourceTree = "<group>"; };
 		830453114A10AFE865F0EB6F /* VitaliaWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitaliaWidgetBundle.swift; sourceTree = "<group>"; };
@@ -417,6 +416,7 @@
 				E8004A7F1C58951684DF215B /* VitaliaWidget.swift */,
 				830453114A10AFE865F0EB6F /* VitaliaWidgetBundle.swift */,
 				373F831D74EA212C5E037A2A /* VitaliaWidgetView.swift */,
+				789FD031510885F45EE4EE1D /* WidgetTokens.swift */,
 			);
 			path = VitaliaWidget;
 			sourceTree = "<group>";
@@ -699,12 +699,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B272A17B1EAAFB821B0E62EA /* Colors.swift in Sources */,
-				1643A752F795A33A8A3D6DD4 /* Spacing.swift in Sources */,
-				7BF51AA3E53073FE4E4D2A33 /* Typography.swift in Sources */,
 				9ABE0386365BB63B40598D86 /* VitaliaWidget.swift in Sources */,
 				82ADC34F417B4DE957157DEC /* VitaliaWidgetBundle.swift in Sources */,
 				7B4B9B2D3B44B53296EBFEC5 /* VitaliaWidgetView.swift in Sources */,
+				4AE5C9C89F8A9AF43E2EB467 /* WidgetTokens.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

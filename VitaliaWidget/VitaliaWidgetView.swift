@@ -6,15 +6,13 @@ struct VitaliaWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Header
             Text("VITALIA")
-                .font(.system(size: 10, weight: .semibold, design: .default))
-                .foregroundStyle(VColor.textTertiary)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(WColor.textTertiary)
                 .tracking(1.5)
-                .padding(.bottom, VSpacing.m)
+                .padding(.bottom, WSpacing.m)
 
-            // Scores row
-            HStack(spacing: VSpacing.l) {
+            HStack(spacing: WSpacing.l) {
                 ScoreColumn(
                     title: "Recovery",
                     icon: "bolt.heart.fill",
@@ -23,28 +21,26 @@ struct VitaliaWidgetView: View {
                 )
 
                 Rectangle()
-                    .fill(VColor.textTertiary.opacity(0.15))
+                    .fill(WColor.textTertiary.opacity(0.15))
                     .frame(width: 1)
 
                 ScoreColumn(
                     title: "Longevity",
                     icon: "figure.run.circle.fill",
                     score: entry.longevityScore,
-                    label: entry.longevityScore.map { VColor.labelForScore($0) } ?? "—"
+                    label: entry.longevityScore.map { WColor.labelForScore($0) } ?? "—"
                 )
             }
             .frame(maxWidth: .infinity)
 
-            // Divider
             Rectangle()
-                .fill(VColor.textTertiary.opacity(0.15))
+                .fill(WColor.textTertiary.opacity(0.15))
                 .frame(height: 1)
-                .padding(.vertical, VSpacing.l)
+                .padding(.vertical, WSpacing.l)
 
-            // Today's workout
             WorkoutSection(entry: entry)
         }
-        .padding(VSpacing.l)
+        .padding(WSpacing.l)
     }
 }
 
@@ -57,19 +53,18 @@ private struct ScoreColumn: View {
     let label: String
 
     private var color: Color {
-        guard let score else { return VColor.textTertiary }
-        return VColor.forScore(score)
+        guard let score else { return WColor.textTertiary }
+        return WColor.forScore(score)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VSpacing.s) {
+        VStack(alignment: .leading, spacing: WSpacing.s) {
             Label(title, systemImage: icon)
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(VColor.textSecondary)
+                .foregroundStyle(WColor.textSecondary)
                 .labelStyle(.titleAndIcon)
 
-            HStack(spacing: VSpacing.m) {
-                // Score ring
+            HStack(spacing: WSpacing.m) {
                 ZStack {
                     Circle()
                         .stroke(color.opacity(0.18), lineWidth: 6)
@@ -86,7 +81,7 @@ private struct ScoreColumn: View {
                     if let score {
                         Text("\(Int(score.rounded()))")
                             .font(.system(size: 26, weight: .black, design: .rounded))
-                            .foregroundStyle(VColor.textPrimary)
+                            .foregroundStyle(WColor.textPrimary)
                             .contentTransition(.numericText())
                         Text(label)
                             .font(.system(size: 11, weight: .semibold))
@@ -94,10 +89,10 @@ private struct ScoreColumn: View {
                     } else {
                         Text("—")
                             .font(.system(size: 26, weight: .black, design: .rounded))
-                            .foregroundStyle(VColor.textTertiary)
+                            .foregroundStyle(WColor.textTertiary)
                         Text("No data")
                             .font(.system(size: 11, weight: .regular))
-                            .foregroundStyle(VColor.textTertiary)
+                            .foregroundStyle(WColor.textTertiary)
                     }
                 }
             }
@@ -112,66 +107,59 @@ private struct WorkoutSection: View {
     let entry: VitaliaWidgetEntry
 
     private var accentColor: Color {
-        guard let score = entry.recoveryScore else { return VColor.accent }
-        return VColor.forScore(score)
+        guard let score = entry.recoveryScore else { return WColor.accent }
+        return WColor.forScore(score)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VSpacing.s) {
-            HStack(spacing: VSpacing.xs) {
-                Text("TODAY")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(VColor.textTertiary)
-                    .tracking(1.2)
-                Spacer()
-            }
+        VStack(alignment: .leading, spacing: WSpacing.s) {
+            Text("TODAY")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(WColor.textTertiary)
+                .tracking(1.2)
 
             if entry.workoutType.isEmpty && !entry.workoutIsRest {
                 Text("Generate a plan to see today's workout")
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundStyle(VColor.textTertiary)
+                    .font(.system(size: 13))
+                    .foregroundStyle(WColor.textTertiary)
             } else if entry.workoutIsRest {
-                HStack(spacing: VSpacing.s) {
+                HStack(spacing: WSpacing.s) {
                     Image(systemName: "moon.fill")
                         .font(.system(size: 13))
-                        .foregroundStyle(VColor.textTertiary)
+                        .foregroundStyle(WColor.textTertiary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Rest Day")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(VColor.textSecondary)
+                            .foregroundStyle(WColor.textSecondary)
                         Text("Recovery & light movement")
-                            .font(.system(size: 12, weight: .regular))
-                            .foregroundStyle(VColor.textTertiary)
+                            .font(.system(size: 12))
+                            .foregroundStyle(WColor.textTertiary)
                     }
                 }
             } else {
                 HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: VSpacing.xs) {
+                    VStack(alignment: .leading, spacing: WSpacing.xs) {
                         Text(entry.workoutType)
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(VColor.textPrimary)
-
+                            .foregroundStyle(WColor.textPrimary)
                         if !entry.workoutZones.isEmpty {
                             Text(entry.workoutZones)
-                                .font(.system(size: 12, weight: .regular))
-                                .foregroundStyle(VColor.textSecondary)
+                                .font(.system(size: 12))
+                                .foregroundStyle(WColor.textSecondary)
                         }
-
                         if !entry.workoutNotes.isEmpty {
                             Text(entry.workoutNotes)
-                                .font(.system(size: 12, weight: .regular))
-                                .foregroundStyle(VColor.textTertiary)
+                                .font(.system(size: 12))
+                                .foregroundStyle(WColor.textTertiary)
                                 .lineLimit(2)
                         }
                     }
-
                     Spacer()
-
                     if !entry.workoutDuration.isEmpty {
                         Text(entry.workoutDuration)
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(accentColor)
-                            .padding(.horizontal, VSpacing.s)
+                            .padding(.horizontal, WSpacing.s)
                             .padding(.vertical, 3)
                             .background(accentColor.opacity(0.12))
                             .clipShape(Capsule())

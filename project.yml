@@ -67,9 +67,6 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: VitaliaWidget
-      - path: Vitalia/DesignSystem/Colors.swift
-      - path: Vitalia/DesignSystem/Spacing.swift
-      - path: Vitalia/DesignSystem/Typography.swift
     info:
       path: VitaliaWidget/Info.plist
       properties:
